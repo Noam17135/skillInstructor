@@ -440,7 +440,7 @@
           '<span class="mdl-for">' + esc(m.for) + '</span>' + ICON.chev + '</summary>' +
           '<div class="mdl-body"><p class="mdl-about">' + esc(m.about) + '</p>' +
           '<div class="mdl-cols"><div><strong>מתאים ל</strong><ul class="ok">' + m.yes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
-          '<div><strong>יש בחירה טובה יותר ל</strong><ul class="nope">' + m.no.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div></div>' +
+          '<div><strong>מתי לא לבחור בו</strong><ul class="nope">' + m.no.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div></div>' +
           (m.lim && m.lim.length ? '<p class="mdl-lim"><strong>שימו לב:</strong> ' + m.lim.map(esc).join(' ') + '</p>' : '') +
           '<p class="mdl-meta">מהירות: ' + SPD[m.speed] + ' · מחיר: ' + LVL[m.cost] + '</p></div></details>';
       }).join('') + '</div>' +
