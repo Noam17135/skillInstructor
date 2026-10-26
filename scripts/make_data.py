@@ -135,6 +135,15 @@ for s in skills:
     if s.get('key') in ('feel', 'emil'):
         s['ov'] = 'ui-polish'
 
+# search vocabulary (generated per skill, see syn_out_*.json)
+SYN = {}
+for f in ['syn_out_0.json', 'syn_out_1.json', 'syn_out_2.json', 'syn_out_3.json']:
+    if os.path.exists(f'{B}/{f}'):
+        SYN.update(json.load(open(f'{B}/{f}')))
+for s in skills:
+    if s['id'] in SYN:
+        s['syn'] = SYN[s['id']]
+
 # order: curated/everyday first, then by installs
 LO = ['יומיומי ותחומים חסרים', 'ברמה גבוהה (craft)', 'אבטחה', 'שימוש נכון בטוקנים', 'פופולרי (טופ 250)']
 skills.sort(key=lambda x: (0 if x.get('rich') else 1, min(LO.index(l) for l in x['layers']), -(x['installs'] or 0)))

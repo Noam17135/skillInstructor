@@ -156,3 +156,5 @@ footer p{font-size:14px;line-height:1.6;color:var(--muted)}
   .details{grid-template-columns:1fr}
   .details>span:nth-child(odd){border-bottom:0}
 }
+.understood{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:18px;font-weight:700}
+.understood .tag{font-size:16px;padding:6px 14px;animation:bubble .35s ease both}

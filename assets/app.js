@@ -40,31 +40,6 @@
     ]
   };
 
-  var JOBS = [
-    { id: 'pdf', label: 'קבצי PDF', need: 'docs', kw: ['pdf', 'סרוק', 'טופס', 'טפסים'] },
-    { id: 'word', label: 'מסמכים', need: 'docs', kw: ['word', 'וורד', 'מסמך', 'מסמכים', 'הצעת מחיר'] },
-    { id: 'excel', label: 'אקסל וטבלאות', need: 'data', kw: ['excel', 'אקסל', 'גיליון', 'טבלה', 'טבלאות', 'תקציב', 'הוצאות'] },
-    { id: 'slides', label: 'מצגות', need: 'slides', kw: ['מצגת', 'מצגות', 'שקפים', 'powerpoint'] },
-    { id: 'email', label: 'מיילים', need: 'office', kw: ['מייל', 'מיילים', 'דואר', 'gmail', 'inbox', 'outlook'] },
-    { id: 'cal', label: 'יומן', need: 'office', kw: ['יומן', 'calendar'] },
-    { id: 'notion', label: 'Notion', need: 'office', kw: ['notion', 'נושן'] },
-    { id: 'meet', label: 'סיכום פגישות', need: 'office', kw: ['פגישה', 'פגישות', 'הקלטה', 'תמלול', 'meeting'] },
-    { id: 'tasks', label: 'משימות', need: 'office', kw: ['משימות', 'todo', 'to-do'] },
-    { id: 'writing', label: 'כתיבה', need: 'writing', kw: ['פוסט', 'פוסטים', 'לכתוב', 'כתיבה', 'ניסוח', 'לינקדאין', 'בלוג'] },
-    { id: 'research', label: 'מחקר', need: 'writing', kw: ['מחקר', 'לחקור', 'research'] },
-    { id: 'cash', label: 'כספים', need: 'business', kw: ['תזרים', 'משכורות', 'כסף', 'הנהלת חשבונות', 'דוח כספי'] },
-    { id: 'legal', label: 'חוזים', need: 'business', kw: ['חוזה', 'חוזים', 'הסכם', 'nda'] },
-    { id: 'hr', label: 'גיוס ועובדים', need: 'business', kw: ['גיוס', 'מועמדים', 'עובדים', 'קורות חיים'] },
-    { id: 'marketing', label: 'שיווק', need: 'marketing', kw: ['שיווק', 'קמפיין', 'seo', 'מודעות', 'קופי'] },
-    { id: 'sales', label: 'מכירות', need: 'marketing', kw: ['מכירות', 'לידים', 'לקוחות פוטנציאליים'] },
-    { id: 'support', label: 'שירות לקוחות', need: 'marketing', kw: ['שירות לקוחות', 'פניות', 'תמיכה'] },
-    { id: 'ui', label: 'עיצוב ממשק', need: 'design', kw: ['ממשק', 'אנימציה', 'אנימציות', 'כפתורים', 'react', 'עיצוב אתר', 'דף נחיתה'] },
-    { id: 'media', label: 'תמונות ווידאו', need: 'design', kw: ['תמונה', 'תמונות', 'וידאו', 'סרטון'] },
-    { id: 'code', label: 'בדיקת קוד', need: 'dev', kw: ['באגים', 'code review', 'בדיקת קוד', 'טסטים'] },
-    { id: 'sec', label: 'אבטחה', need: 'security', kw: ['אבטחה', 'סיסמאות', 'פרצות', 'security'] },
-    { id: 'tok', label: 'חיסכון בטוקנים', need: 'tokens', kw: ['טוקנים', 'טוקן', 'tokens'] }
-  ];
-
   var GUIDES = [
     { id: 'small-business', title: 'הסקילים הכי טובים לבעלי עסק קטן', short: 'מיילים, חוזים ותזרים. שלושה סקילים שמכסים את רוב הניירת.', color: '#FFC2D1',
       intro: 'רוב הזמן של בעל עסק קטן הולך על מיילים, על חוזים ועל השאלה אם יהיה מספיק כסף בסוף החודש. שלושת הסקילים האלה מכסים את זה, כולם של Anthropic.',
@@ -100,21 +75,28 @@
   var st = { q: '', need: 'all', level: 'everyday', shown: 24, bq: '', built: '', tool: '', install: false, adv: false };
 
   /* ---------- search ---------- */
-  var PREF = /^[והבלמשכ]{1,2}(?=[֐-׿]{2,})/;
-  var norm = function (w) { return w.toLowerCase().replace(/[״"׳']/g, ''); };
-  function matches(s, q) {
-    var words = q.split(/\s+/).filter(Boolean).map(norm);
-    return words.every(function (w) {
-      return s._text.indexOf(w) !== -1 || s._text.indexOf(w.replace(PREF, '')) !== -1;
-    });
-  }
+  var engine = null;
   function filtered() {
     var q = st.q.trim();
+    if (q && engine) {
+      return engine.search(q).map(function (r) { return S[r.idx]; }).filter(function (s) {
+        return st.need === 'all' || s.need === st.need;
+      });
+    }
     return S.filter(function (s) {
       if (st.need !== 'all' && s.need !== st.need) return false;
-      if (!q && st.level !== 'all' && s.level !== st.level) return false;
-      return !q || matches(s, q);
+      return st.level === 'all' || s.level === st.level;
     });
+  }
+  var SITE = 'https://noam17135.github.io/skillInstructor/';
+  function askAI(text, tool) {
+    var prompt = 'אני מחפש סקילים (SKILL.md) לכלי ה־AI שלי' + (tool ? ' (' + tool + ')' : '') + '. זה מה שאני צריך: ' + text +
+      '\nתעבור על הקטלוג של SkillFit בכתובת ' + SITE + 'llms.txt ותמליץ לי על סקיל אחד לכל צורך, בלי סקילים חופפים. לכל סקיל תסביר במשפט למה הוא מתאים ותצרף את הקישור לעמוד שלו.';
+    var e = encodeURIComponent(prompt);
+    return '<div class="box" style="background:var(--purple)"><strong style="font-family:var(--head);font-weight:400;font-size:24px">רוצים לנסח חופשי לגמרי?</strong>' +
+      '<span style="font-size:17px">תשאלו את ה־AI שלכם. הכנו לו את השאלה, כולל הקישור לקטלוג שלנו.</span>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:10px"><a class="btn shadow" target="_blank" rel="noopener" href="https://claude.ai/new?q=' + e + '">לשאול את Claude ↗</a>' +
+      '<a class="btn shadow" target="_blank" rel="noopener" href="https://chatgpt.com/?q=' + e + '">לשאול את ChatGPT ↗</a></div></div>';
   }
 
   /* ---------- pieces ---------- */
@@ -156,7 +138,7 @@
       '<div class="row-chips" role="group" aria-label="סינון לפי צורך">' + chips(NEEDS, 'need', st.need) + '</div>' +
       (list.length ? '<div class="grid">' + list.slice(0, st.shown).map(card).join('') + '</div>' +
         (list.length > st.shown ? '<button type="button" class="btn shadow more" data-act="more">להציג עוד (' + (list.length - st.shown) + ')</button>' : '')
-        : requestBox(q));
+        : requestBox(q) + (q ? askAI(q, '') : ''));
   }
   function home() {
     var tries = [['לחבר קבצי PDF', 'PDF'], ['מצגת', 'מצגת'], ['מיילים', 'מייל'], ['תזרים', 'תזרים']];
@@ -258,61 +240,37 @@
     if (!s.works || !s.works.length) return 0.5;
     return s.works.some(function (w) { return w === tool || w === tool + ' (Cowork)'; }) ? 1 : 0;
   }
-  function buildSet(text, tool) {
-    var t = ' ' + text.toLowerCase() + ' ';
-    var jobs = JOBS.filter(function (j) { return j.kw.some(function (k) { return t.indexOf(k) !== -1; }); });
-    var picked = [], skipped = [], missing = [], seen = {};
-    jobs.forEach(function (j) {
-      var hit = function (s) { return j.kw.some(function (k) { return s._text.indexOf(k) !== -1; }); };
-      var cands = S.filter(function (s) { return s.need === j.need && hit(s); });
-      if (!cands.length) cands = S.filter(hit);
-      if (!cands.length) { missing.push(j.label); return; }
-      var pro = ['dev', 'security', 'tokens'].indexOf(j.need) !== -1;
-      cands.sort(function (a, b) {
-        return (fit(b, tool) - fit(a, tool)) || ((b.rich ? 1 : 0) - (a.rich ? 1 : 0)) ||
-          (pro ? 0 : ((b.level === 'everyday') - (a.level === 'everyday'))) || ((b.official ? 1 : 0) - (a.official ? 1 : 0)) || ((b.installs || 0) - (a.installs || 0));
-      });
-      var top = cands[0];
-      var existing = picked.filter(function (p) { return p.s.id === top.id || (top.ov && p.s.ov === top.ov); })[0];
-      if (existing) { if (existing.jobs.indexOf(j.label) === -1) existing.jobs.push(j.label); return; }
-      picked.push({ s: top, jobs: [j.label] });
-      seen[top.id] = 1;
-      if (top.ov) (byOv[top.ov] || []).filter(function (o) { return o.id !== top.id && !seen[o.id]; }).slice(0, 3).forEach(function (o) {
-        seen[o.id] = 1;
-        skipped.push({ s: o, why: 'עושה כמעט אותו דבר כמו ״' + top.title + '״, ' + (tool && fit(top, tool) === 1 && fit(o, tool) === 0 ? 'ולא מוזכר שעובד עם ' + tool + '.' : 'שכבר בסט. מספיק אחד.') });
-      });
-    });
-    return { jobs: jobs, picked: picked, skipped: skipped, missing: missing };
-  }
   function buildResults() {
-    if (!st.built) return '';
-    var r = buildSet(st.built, st.tool);
-    if (!r.jobs.length) return '<section class="box in" style="font-size:18px">לא הצלחנו להבין מה צריך. נסו לכתוב משימות, למשל ״לבנות מצגות״, ״לסדר מיילים״ או ״לבדוק חוזה״.</section>';
-    var h = '<section class="in" style="display:flex;flex-direction:column;gap:22px">';
-    if (r.picked.length) {
-      h += '<div class="sec-head"><h2>הסט שלך: ' + (r.picked.length === 1 ? 'סקיל אחד' : r.picked.length + ' סקילים') + '</h2><span style="font-size:16px;font-weight:700">זיהינו: ' + esc(r.jobs.map(function (j) { return j.label; }).join(', ')) + '</span></div>';
-      h += '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:24px">' + r.picked.map(function (p, i) {
-        var s = p.s, f = fit(s, st.tool);
-        return '<div class="card ' + TILTS[i % 4] + '" style="cursor:default;gap:12px;animation-delay:' + i * 0.06 + 's">' +
-          '<span class="tag" style="align-self:flex-start;background:' + C[s.need].color + '">בשביל: ' + esc(p.jobs.join(', ')) + '</span>' +
-          '<span class="t">' + esc(s.title) + '</span><span class="w">' + esc(s.what) + '</span>' +
-          '<span style="font-size:14px;font-weight:600;color:var(--muted)">' + esc(s.by) + ' · ' + esc(s.evShort) + '</span>' +
-          (st.tool && f < 1 ? '<span style="padding:8px 12px;background:#FFE08A;border:2px solid var(--ink);border-radius:12px;font-size:14px;font-weight:600">' +
-            (f === 0 ? 'לא מוזכר בתיעוד שעובד עם ' + esc(st.tool) + '. אין לנו חלופה שכן.' : 'עוד לא בדקנו אם הוא עובד עם ' + esc(st.tool) + '.') + '</span>' : '') +
-          '<a class="btn yellow" style="align-self:flex-start;margin-top:auto;min-height:46px" href="#/skill/' + esc(s.id) + '">לעמוד הסקיל</a></div>';
-      }).join('') + '</div>';
-    }
-    if (r.skipped.length) h += '<div class="box" style="background:var(--red)"><strong style="font-family:var(--head);font-weight:400;font-size:26px">לא הוספנו, כי זה חופף</strong>' + r.skipped.map(function (k) {
-      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:17px"><a class="btn" style="min-height:44px;padding:0 14px;border-width:2px;border-radius:12px" href="#/skill/' + esc(k.s.id) + '">' + esc(k.s.title) + '</a><span>' + esc(k.why) + '</span></div>';
+    var text = (st.bq || '').trim();
+    if (!text || !engine) return '';
+    var r = engine.cover(text, { tool: st.tool });
+    if (!r.picks.length) return '<section class="box in" style="font-size:18px">עוד לא הבנתי מה צריך. נסו לתאר משימות, למשל ״לבנות מצגות ללקוחות״ או ״לענות מהר למיילים״.</section>' + askAI(text, st.tool);
+    var h = '<section style="display:flex;flex-direction:column;gap:22px">';
+    h += '<div class="understood"><span>הבנתי שאתם צריכים:</span>' + r.picks.map(function (p) {
+      return '<span class="tag" style="background:' + C[p.s.need].color + '">' + esc(p.words.join(' · ')) + '</span>'; }).join('') + '</div>';
+    h += '<div class="sec-head"><h2>הסט שלכם: ' + (r.picks.length === 1 ? 'סקיל אחד' : r.picks.length + ' סקילים') + '</h2></div>';
+    h += '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:24px">' + r.picks.map(function (p, i) {
+      var s = p.s, f = fit(s, st.tool);
+      return '<div class="card ' + TILTS[i % 4] + '" style="cursor:default;gap:12px;animation-delay:' + i * 0.06 + 's">' +
+        '<span class="tag" style="align-self:flex-start;background:' + C[s.need].color + '">בשביל: ' + esc(p.words.join(', ')) + '</span>' +
+        '<span class="t">' + esc(s.title) + '</span><span class="w">' + esc(s.what) + '</span>' +
+        '<span style="font-size:14px;font-weight:600;color:var(--muted)">' + esc(s.by) + ' · ' + esc(s.evShort) + '</span>' +
+        (st.tool && f < 1 ? '<span style="padding:8px 12px;background:#FFE08A;border:2px solid var(--ink);border-radius:12px;font-size:14px;font-weight:600">' +
+          (f === 0 ? 'לא מוזכר בתיעוד שעובד עם ' + esc(st.tool) + '.' : 'עוד לא בדקנו אם הוא עובד עם ' + esc(st.tool) + '.') + '</span>' : '') +
+        '<a class="btn yellow" style="align-self:flex-start;margin-top:auto;min-height:46px" href="#/skill/' + esc(s.id) + '">לעמוד הסקיל</a></div>';
     }).join('') + '</div>';
-    if (r.missing.length) h += '<div class="box" style="background:var(--blue)"><strong style="font-family:var(--head);font-weight:400;font-size:26px">לזה עוד אין סקיל בקטלוג</strong><span style="font-size:17px">' + esc(r.missing.join(', ')) + '. אפשר לבקש שנוסיף, דרך הטופס בתחתית הקטלוג.</span></div>';
-    h += '<div class="box" style="background:var(--ink);color:#fff;border-color:var(--ink)"><strong style="font-family:var(--head);font-weight:400;font-size:26px;color:var(--yellow)">איך מתקינים סט</strong><span style="font-size:17px">אחד־אחד, מהעמוד של כל סקיל. מתחילים מזה שתשתמשו בו הכי הרבה, ובודקים אותו לפני שמוסיפים את הבא.</span></div></section>';
+    if (r.skipped.length) h += '<div class="box" style="background:var(--red)"><strong style="font-family:var(--head);font-weight:400;font-size:26px">לא הוספנו, כי זה חופף</strong>' + r.skipped.map(function (k) {
+      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:17px"><a class="btn" style="min-height:44px;padding:0 14px;border-width:2px;border-radius:12px" href="#/skill/' + esc(k.s.id) + '">' + esc(k.s.title) + '</a><span>עושה כמעט אותו דבר כמו ״' + esc(k.instead.title) + '״. מספיק אחד.</span></div>';
+    }).join('') + '</div>';
+    if (r.leftover.length) h += '<div class="box" style="background:var(--blue)"><strong style="font-family:var(--head);font-weight:400;font-size:24px">את זה עוד לא הצלחתי לשייך</strong><span style="font-size:17px">' + esc(r.leftover.slice(0, 8).join(', ')) + '. אם זה חשוב, ספרו לנו דרך הטופס בתחתית הקטלוג, או נסו לנסח אחרת.</span></div>';
+    h += '<div class="box" style="background:var(--ink);color:#fff;border-color:var(--ink)"><strong style="font-family:var(--head);font-weight:400;font-size:26px;color:var(--yellow)">איך מתקינים סט</strong><span style="font-size:17px">אחד־אחד, מהעמוד של כל סקיל. מתחילים מזה שתשתמשו בו הכי הרבה, ובודקים אותו לפני שמוסיפים את הבא.</span></div>';
+    h += askAI(text, st.tool) + '</section>';
     return h;
   }
   function build() {
-    var tries = ['יש לי עסק קטן: מיילים, חוזים ותזרים', 'מצגות מדוחות באקסל, ופוסטים ללינקדאין', 'אני מלטש ממשק React ורוצה אנימציות טובות'];
+    var tries = ['אני מנהלת קליניקה, טובעת במיילים ורוצה לבדוק חוזים מול ספקים', 'מכין פרזנטציות מדוחות אקסל וכותב פוסטים ללינקדאין', 'מלטש ממשק React ורוצה אנימציות שמרגישות טוב'];
     return '<div class="wrap narrow page"><section class="page-head in"><h1>בנו לי סט</h1>' +
-      '<p class="lead" style="max-width:720px">כתבו במילים שלכם מה אתם עושים ביום־יום. נרכיב לכם סט קטן מהקטלוג: סקיל אחד לכל צורך, בלי כפילויות.</p></section>' +
+      '<p class="lead" style="max-width:720px">ספרו במילים שלכם מה אתם עושים ומה מעיק עליכם. תוך כדי ההקלדה נרכיב לכם סט קטן מהקטלוג: סקיל אחד לכל צורך, בלי כפילויות.</p></section>' +
       '<form class="box shadow" id="buildform" style="gap:18px"><label for="bq" style="font-family:var(--head);font-size:26px">מה אתם רוצים שה־AI יעשה בשבילכם?</label>' +
       '<textarea id="bq" class="big" rows="4" placeholder="למשל: יש לי עסק קטן. אני רוצה עזרה עם המיילים, לבדוק חוזים ולדעת אם יהיה כסף למשכורות">' + esc(st.bq) + '</textarea>' +
       '<div class="row-chips"><span>דוגמאות:</span>' + tries.map(function (t) {
@@ -321,7 +279,7 @@
       [''].concat(TOOLS).map(function (t) {
         return '<button type="button" class="chip" data-act="tool" data-v="' + esc(t) + '" aria-pressed="' + (st.tool === t) + '">' + esc(t || 'לא משנה') + '</button>'; }).join('') + '</div>' +
       '<button type="submit" class="btn pink big" style="align-self:flex-start">תרכיבו לי סט</button></form>' +
-      '<div id="results" aria-live="polite">' + buildResults() + '</div></div>';
+      '<div id="results" aria-live="polite" style="display:flex;flex-direction:column;gap:22px">' + buildResults() + '</div></div>';
   }
 
   /* ---------- guides ---------- */
@@ -414,18 +372,18 @@
     else if (act === 'adv') { st.adv = !st.adv; rerender(); }
     else if (act === 'copy') { try { navigator.clipboard.writeText(v); } catch (x) {} b.textContent = 'הועתק'; }
     else if (act === 'tool') { st.tool = v; st.bq = $('#bq').value; rerender(); }
-    else if (act === 'buildtry') { st.bq = v; st.built = v; rerender(); var r = $('#results'); if (r) r.scrollIntoView({ behavior: 'smooth' }); }
+    else if (act === 'buildtry') { st.bq = v; rerender(); var r = $('#results'); if (r) r.scrollIntoView({ behavior: 'smooth' }); }
   });
   function refreshCatalog() { var c = $('#catalog'); if (c) c.innerHTML = catalogBody(); }
-  var timer;
+  var timer, btimer;
   document.addEventListener('input', function (e) {
     if (e.target.id === 'q') { clearTimeout(timer); var v = e.target.value; timer = setTimeout(function () { st.q = v; st.shown = 24; refreshCatalog(); }, 150); }
-    if (e.target.id === 'bq') st.bq = e.target.value;
+    if (e.target.id === 'bq') { st.bq = e.target.value; clearTimeout(btimer); btimer = setTimeout(function () { var r = $('#results'); if (r) r.innerHTML = buildResults(); }, 280); }
   });
   document.addEventListener('submit', function (e) {
     e.preventDefault();
     if (e.target.id === 'searchform') { document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' }); return; }
-    if (e.target.id === 'buildform') { st.built = st.bq || ' '; var r = $('#results'); r.innerHTML = buildResults(); r.scrollIntoView({ behavior: 'smooth' }); return; }
+    if (e.target.id === 'buildform') { st.bq = $('#bq').value; var r = $('#results'); r.innerHTML = buildResults(); r.scrollIntoView({ behavior: 'smooth' }); return; }
     if (e.target.classList.contains('req')) { toast('תודה! זו גרסת בדיקה, ועוד אין חיבור לשליחה.'); }
   });
   function toast(t) {
@@ -445,6 +403,7 @@
       if (s.ov) (byOv[s.ov] = byOv[s.ov] || []).push(s);
       s._text = [s.title, s.what, s.ask, s.name, s.repo, s.job, s.desc, C[s.need] && C[s.need].label].join(' ').toLowerCase().replace(/[״"׳']/g, '');
     });
+    engine = new window.SFMatch.Engine(S);
     route();
   }).catch(function () { $('#main').innerHTML = '<div class="wrap page"><p class="box">לא הצלחנו לטעון את הקטלוג. נסו לרענן.</p></div>'; });
 })();
