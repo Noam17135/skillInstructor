@@ -112,6 +112,38 @@ for i, r in enumerate(R):
     s['id'] = base if used[base] == 1 else f"{slugify(r['repo'].split('/')[0])}-{base}"
     skills.append(s)
 
+
+# ---- student skills (separate research, students_raw.json + students_he.json) ----
+def num(v):
+    if v is None: return 0
+    m = re.search(r'([\d.,]+)\s*([KkMm]?)', str(v))
+    if not m: return 0
+    x = float(m.group(1).replace(',', ''))
+    return int(x * (1000 if m.group(2) in 'Kk' and m.group(2) else 1_000_000 if m.group(2) in 'Mm' and m.group(2) else 1))
+if os.path.exists(f'{B}/students_raw.json') and os.path.exists(f'{B}/students_he.json'):
+    raw = json.load(open(f'{B}/students_raw.json'))
+    he = {(x['repo'].lower(), x['name']): x for x in json.load(open(f'{B}/students_he.json'))}
+    existing = {(s['repo'].lower(), s['name']): s for s in skills}
+    for r in raw:
+        k = (r['repo'].lower(), r['name']); h = he.get(k)
+        if not h: continue
+        if k in existing:
+            existing[k].setdefault('fields', []).append(r['field']); continue
+        ins, stars = num(r.get('installs')), num(r.get('stars'))
+        st = dict(name=r['name'], repo=r['repo'], url=r['url'], need='study', official=bool(r.get('official')), installs=ins,
+                  by=r['publisher'].split('(')[0].strip(), title=h['title'], what=h['what'].rstrip('.') + '.', ask=h['ask'].strip('״"'),
+                  needs=h['needs'], nots=h['nots'], syn=h['syn'], level=h['level'], desc=r['desc'], fields=[r['field']],
+                  cmd=r.get('install') or f"npx skills add {r['repo']} --skill {r['name']}", steps='code', layers=['סטודנטים'])
+        envs = [e for e in (r.get('envs') or []) if len(e) < 40]
+        if envs: st['works'] = envs
+        if r.get('note'): st['note'] = r['note']
+        st['evidence'], st['evShort'], st['evDetail'] = evidence(dict(installs=ins, stars=stars, official=st['official']))
+        if ins and ins < 10000 and stars >= 1000:
+            st['evDetail'] += ' · ' + fmt_k(stars) + ' כוכבים לריפו'
+        base = slugify(r['name']); used[base] += 1
+        st['id'] = base if used[base] == 1 else f"{slugify(r['repo'].split('/')[0])}-{base}"
+        skills.append(st)
+
 # overlap groups: hand-made groups override, otherwise identical job text
 ov = {}
 for gname, members in OVERRIDES.get('groups', {}).items():
@@ -145,7 +177,7 @@ for s in skills:
         s['syn'] = SYN[s['id']]
 
 # order: curated/everyday first, then by installs
-LO = ['יומיומי ותחומים חסרים', 'ברמה גבוהה (craft)', 'אבטחה', 'שימוש נכון בטוקנים', 'פופולרי (טופ 250)']
+LO = ['יומיומי ותחומים חסרים', 'ברמה גבוהה (craft)', 'סטודנטים', 'אבטחה', 'שימוש נכון בטוקנים', 'פופולרי (טופ 250)']
 skills.sort(key=lambda x: (0 if x.get('rich') else 1, min(LO.index(l) for l in x['layers']), -(x['installs'] or 0)))
 for s in skills:
     s.pop('layers', None)

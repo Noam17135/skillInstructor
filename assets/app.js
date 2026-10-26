@@ -21,7 +21,8 @@
     { id: 'design', label: 'עיצוב ומדיה', color: '#FF9E7A' },
     { id: 'dev', label: 'פיתוח', color: '#C9D3FF' },
     { id: 'security', label: 'אבטחה', color: '#FF9E9E' },
-    { id: 'tokens', label: 'חיסכון בטוקנים', color: '#E6E6E6' }
+    { id: 'tokens', label: 'חיסכון בטוקנים', color: '#E6E6E6' },
+    { id: 'study', label: 'לימודים', color: '#C8F7C5' }
   ];
   var C = {}; NEEDS.forEach(function (n) { C[n.id] = n; });
   var TILTS = ['tilt-a', 'tilt-b', 'tilt-c', 'tilt-d'];
@@ -141,7 +142,7 @@
         : requestBox(q) + (q ? askAI(q, '') : ''));
   }
   function home() {
-    var tries = [['לחבר קבצי PDF', 'PDF'], ['מצגת', 'מצגת'], ['מיילים', 'מייל'], ['תזרים', 'תזרים']];
+    var tries = [['לחבר קבצי PDF', 'PDF'], ['מצגת', 'מצגת'], ['מיילים', 'מייל'], ['הכנה למבחן', 'הכנה למבחן'], ['רגרסיה', 'רגרסיה']];
     return '<div class="wrap page" style="gap:56px">' +
       '<section class="hero in"><h1>תן ל־AI<br>כוח־על חדש.</h1>' +
       '<p class="lead">סקיל הוא תוסף קטן שמלמד את ה־AI לעשות משהו אחד ממש טוב. כתוב מה אתה צריך, ונמצא לך את הסקיל המתאים.</p>' +
@@ -285,7 +286,7 @@
   /* ---------- guides ---------- */
   function guides() {
     return '<div class="wrap narrow page"><section class="page-head in"><h1>מדריכים</h1><p class="lead" style="max-width:720px">מה להתקין לכל סוג עבודה. בכל מדריך 2–3 סקילים בלבד, ולמה דווקא הם.</p></section>' +
-      '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:26px">' + GUIDES.map(function (g, i) {
+      '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:26px">' + '<a class="card tilt-d" href="#/students" style="background:#C8F7C5;padding:26px;gap:12px"><span class="t" style="font-size:28px">סקילים לסטודנטים</span><span style="font-size:17px">מדעי הנתונים, הנדסה, כלכלה ופסיכולוגיה. לעבודות וללמידה.</span><span style="margin-top:auto;font-size:15px;font-weight:800">לפי תחום · לקריאה</span></a>' + GUIDES.map(function (g, i) {
         return '<a class="card ' + TILTS[i % 4] + '" href="#/guide/' + g.id + '" style="background:' + g.color + ';padding:26px;gap:12px"><span class="t" style="font-size:28px">' + esc(g.title) + '</span>' +
           '<span style="font-size:17px">' + esc(g.short) + '</span><span style="margin-top:auto;font-size:15px;font-weight:800">' + g.items.length + ' סקילים · לקריאה</span></a>';
       }).join('') + '</div></div>';
@@ -305,6 +306,92 @@
       }).join('') +
       '<section class="box" style="background:var(--red);padding:26px"><strong style="font-family:var(--head);font-weight:400;font-size:26px">מה לא צריך</strong><span style="font-size:17px;line-height:1.6">' + esc(g.skip) + '</span></section>' +
       '<a class="btn shadow" style="align-self:flex-start;min-height:56px" href="#/build">העבודה שלך שונה? <strong style="font-family:var(--head);font-weight:400">בנו סט משלכם</strong></a></article></div>';
+  }
+
+
+
+  /* ---------- students ---------- */
+  var FIELDS = [
+    ['general-study', 'לכל סטודנט', '#FFE08A', 'ללמוד, לסכם, להתכונן למבחן ולנהל מקורות.'],
+    ['data-science', 'מדעי הנתונים', '#9BE38A', 'ניתוח נתונים, מודלים, גרפים וכתיבת מאמר.'],
+    ['engineering', 'הנדסה', '#7CD8FF', 'MATLAB, סימולציות, מתמטיקה סימבולית ויחידות מידה.'],
+    ['economics', 'כלכלה', '#FFC2D1', 'אקונומטריקה ב־Stata וב־R, ניתוח נתונים ומודל DCF.'],
+    ['psychology', 'פסיכולוגיה', '#D7B8FF', 'סטטיסטיקה, תכנון ניסוי, עוצמה סטטיסטית ודיווח לפי APA.']
+  ];
+  function students() {
+    return '<div class="wrap page" style="max-width:1160px"><section class="page-head in"><h1>סקילים לסטודנטים</h1>' +
+      '<p class="lead" style="max-width:780px">גם לעבודות ולפרויקטים שצריך להגיש, וגם ללמידה עצמה. בחרו את התחום שלכם, וקחו רק את מה שמתאים לקורס שאתם בו עכשיו.</p>' +
+      '<div class="row-chips">' + FIELDS.map(function (f) { return '<a class="chip" style="display:inline-flex;align-items:center;text-decoration:none;background:' + f[2] + '" href="#/students/' + f[0] + '">' + f[1] + '</a>'; }).join('') + '</div></section>' +
+      '<section class="box" style="background:var(--ink);color:#fff;border-color:var(--ink)"><strong style="font-family:var(--head);font-weight:400;font-size:26px;color:var(--yellow)">ללמוד, לא להעתיק</strong>' +
+      '<span style="font-size:17px">הסקילים כאן עוזרים להבין, לתרגל ולעבוד נכון עם נתונים ומקורות. הם לא כותבים את העבודה במקומכם. ובדקו תמיד מה המדיניות בקורס לגבי שימוש ב־AI.</span></section>' +
+      FIELDS.map(function (f) {
+        var list = S.filter(function (s) { return (s.fields || []).indexOf(f[0]) !== -1; });
+        if (!list.length) return '';
+        return '<section id="' + f[0] + '" style="display:flex;flex-direction:column;gap:16px;scroll-margin-top:20px"><div class="sec-head"><h2>' + f[1] + '</h2><span style="font-size:16px;font-weight:700">' + list.length + ' סקילים</span></div>' +
+          '<p style="font-size:18px">' + f[3] + '</p><div class="grid">' + list.map(card).join('') + '</div></section>';
+      }).join('') +
+      '<section class="box" style="background:var(--red)"><h2>מה לא מצאנו</h2><ul><li>בפסיכולוגיה אין עדיין סקיל טוב ל־SPSS או ל־jamovi, ואין סקיל ייעודי לעיצוב לפי APA. הסקילים כאן הם סקילים כלליים של שיטות מחקר.</li><li>ל־LaTeX אין עדיין סקיל ייעודי חזק. בינתיים יש תבניות לכתיבת מאמרים.</li><li>חלק מסקילי ההנדסה והכלכלה דורשים תוכנה בתשלום, כמו MATLAB ו־Stata. זה כתוב בכל עמוד.</li></ul></section></div>';
+  }
+
+  /* ---------- models ---------- */
+  var MODELS = [
+    { name: 'Claude', by: 'Anthropic', color: '#FFB86B', where: 'אפליקציית Claude, Claude Code',
+      tiers: [['Fable 5.1', 'הכי חזק, אבל איטי ויקר'], ['Opus 5.5', 'חזק מאוד, וההמלצה של Anthropic להתחיל ממנו'], ['Sonnet 5.5', 'מהיר וחכם, האיזון הטוב'], ['Haiku 5.5', 'הכי מהיר וזול']],
+      good: ['משימות ארוכות שרצות שעות, בעיקר קוד', 'מסיים עבודה עד קובץ אמיתי: מסמך, גיליון או מצגת', 'קורא מסמכים ארוכים מאוד'],
+      skills: 'כן. באפליקציה, ב־Claude Code וב־API. Anthropic גם יצרה את פורמט הסקילים.',
+      src: [['מדריך בחירת מודל', 'https://platform.claude.com/docs/en/about-claude/models/choosing-a-model'], ['סקילים באפליקציה', 'https://support.claude.com/en/articles/12512176-what-are-skills']] },
+    { name: 'ChatGPT', by: 'OpenAI', color: '#9BE38A', where: 'ChatGPT, Codex',
+      tiers: [['GPT-6 Astra', 'הכי חזק, במסלולים בתשלום'], ['GPT-6.1 Sol', 'קרוב לחזק, וזול יותר'], ['GPT-6 Luna', 'הכי מהיר וזול. בחשבון חינמי מקבלים כרגע את GPT-5.6 Luna']],
+      good: ['עבודה במחשב ובדפדפן בשבילך', 'שואל שאלות הבהרה ממוקדות', 'הדגמים הזולים טובים מאוד ביחס למחיר'],
+      skills: 'כן. ב־ChatGPT (בסביבות עבודה) וב־Codex.',
+      src: [['GPT-6 Astra', 'https://openai.com/index/gpt-6-astra/'], ['מודלים ב־ChatGPT', 'https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt'], ['סקילים ב־ChatGPT', 'https://openai.com/academy/skills/']] },
+    { name: 'Gemini', by: 'Google', color: '#7CD8FF', where: 'אפליקציית Gemini, חיפוש Google, Gemini CLI',
+      tiers: [['Gemini 4 Argon', 'הכי חזק, במסלולי Pro ו־Ultra'], ['Gemini 3.8 Flash', 'מהיר וזול, טוב לקוד ולסוכנים'], ['Gemma 4', 'מודל פתוח שרץ גם על טלפון, בלי אינטרנט']],
+      good: ['מבין טקסט, תמונות, קול וגם וידאו', 'קורא מסמכים ארוכים מאוד', 'מחובר לשירותים של Google'],
+      skills: 'כן. באפליקציה (סקילים מחליפים את ה־Gems, ואפשר לייבא קובצי SKILL.md) וב־Gemini CLI.',
+      src: [['Gemini 4 Argon', 'https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/'], ['סקילים ב־Gemini', 'https://support.google.com/gemini/answer/18560919']] },
+    { name: 'Grok', by: 'xAI', color: '#E6E6E6', where: 'אפליקציית Grok, X, Grok Build',
+      tiers: [['Grok 4.7', 'המודל החזק שלהם לקוד ולעבודה משרדית']],
+      good: ['מחיר טוב ביחס לביצועים בקוד', 'עבודה עם Excel, PowerPoint ו־Word'],
+      skills: 'ל־Grok Build יש "skills", אבל לא מצאנו אישור שזה אותו פורמט.',
+      src: [['Grok 4.7', 'https://x.ai/news/grok-4-7']] },
+    { name: 'Meta AI', by: 'Meta', color: '#D7B8FF', where: 'WhatsApp, Instagram, Facebook, אפליקציית Meta AI',
+      tiers: [['Muse Wonder', 'המודל החזק החדש, לסוכנים'], ['Muse Spark', 'קטן ומהיר, מאחורי Meta AI באפליקציות']],
+      good: ['כבר נמצא באפליקציות שכולם משתמשים בהן', 'מבין תמונות ומצלמה'],
+      skills: 'לא מצאנו תמיכה בסקילים.',
+      src: [['Muse Wonder', 'https://about.fb.com/news/2026/10/introducing-muse-wonder-models/']] },
+    { name: 'מודלים פתוחים', by: 'DeepSeek · Qwen · Mistral', color: '#FFC2D1', where: 'כל אחד יכול להוריד ולהריץ, או דרך האתרים שלהם',
+      tiers: [['DeepSeek V4', 'זול מאוד וחזק בקוד'], ['Qwen 3.8', 'יש גרסה פתוחה בגודל שאפשר להריץ על מחשב חזק'], ['Mistral Large 4', 'אירופאי, תומך בהרבה שפות']],
+      good: ['זולים, ואפשר להריץ אותם על שרת משלך', 'במבחן הסקילים, DeepSeek Flash הגיע למקום הראשון'],
+      skills: 'למודל עצמו אין סקילים. אפשר להשתמש בו בתוך כלי שתומך בסקילים, כמו Codex או Cursor.',
+      src: [['DeepSeek', 'https://api-docs.deepseek.com/news/news261017/'], ['Qwen', 'https://github.com/QwenLM/Qwen3.8'], ['Mistral Large 4', 'https://mistral.ai/news/mistral-large-4/']] }
+  ];
+  function models() {
+    return '<div class="wrap page" style="max-width:1100px"><section class="page-head in"><h1>מודלים, בפשטות</h1>' +
+      '<p class="lead" style="max-width:760px">מי המודלים, במה כל אחד טוב, ואיך זה קשור לסקילים. בלי מילים גבוהות.</p>' +
+      '<span class="dark-tag" style="align-self:flex-start;padding:5px 14px;font-size:15px">נכון לאוקטובר 2026. זה משתנה כל חודש.</span></section>' +
+      '<section class="steps3">' +
+      step('#FFFFFF', '🧠', 'המודל', 'המוח. הוא קורא, חושב וכותב. Claude, GPT, Gemini.') +
+      step('#9BE38A', '📱', 'האפליקציה', 'המקום שבו עובדים עם המוח: ChatGPT, Claude, Cursor. היא זו שטוענת את הסקילים.') +
+      step('#FFB86B', '📋', 'הסקיל', 'מתכון. הוראות כתובות שהמודל קורא כשהן רלוונטיות.') + '</section>' +
+      '<p style="font-size:19px;line-height:1.6;max-width:820px">לכן השאלה הראשונה היא לא איזה מודל, אלא <strong>האם האפליקציה שלך תומכת בסקילים</strong>. אותו סקיל עובד ב־Claude, ב־ChatGPT וב־Codex, ב־Gemini, ב־Copilot וב־Cursor.</p>' +
+      '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:24px">' + MODELS.map(function (m, i) {
+        return '<article class="card ' + TILTS[i % 4] + '" style="cursor:default;gap:12px;animation-delay:' + i * 0.05 + 's">' +
+          '<div class="row"><span class="t" style="font-size:30px">' + esc(m.name) + '</span><span class="tag" style="background:' + m.color + '">' + esc(m.by) + '</span></div>' +
+          '<span style="font-size:15px;color:var(--muted);font-weight:600">איפה משתמשים: ' + esc(m.where) + '</span>' +
+          '<div style="display:flex;flex-direction:column;gap:6px">' + m.tiers.map(function (t) {
+            return '<div style="display:flex;gap:8px;align-items:baseline;font-size:16px"><strong style="white-space:nowrap" dir="ltr">' + esc(t[0]) + '</strong><span>' + esc(t[1]) + '</span></div>'; }).join('') + '</div>' +
+          '<div style="padding:12px 14px;background:var(--cream);border:2px solid var(--ink);border-radius:14px"><strong style="font-size:15px">במה הוא טוב</strong><ul style="margin:6px 0 0;padding:0 18px 0 0;font-size:15px;display:flex;flex-direction:column;gap:4px">' +
+          m.good.map(function (g) { return '<li>' + esc(g) + '</li>'; }).join('') + '</ul></div>' +
+          '<span style="font-size:15px"><strong>סקילים: </strong>' + esc(m.skills) + '</span>' +
+          '<span class="note" style="margin-top:auto">מקורות: ' + m.src.map(function (x) { return '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>'; }).join(' · ') + '</span></article>';
+      }).join('') + '</div>' +
+      '<section class="less"><h2>אז המודל משנה?</h2><div class="cols">' +
+      '<div><strong>סקיל עוזר כמעט לכל מודל</strong><span style="font-size:17px">במבחן SkillsBench, הוספת סקילים העלתה את ההצלחה בכ־14.5 נקודות בממוצע, גם למודלים חזקים וגם לחלשים.</span></div>' +
+      '<div><strong>סקיל טוב לפעמים שווה יותר ממודל גדול</strong><span style="font-size:17px">במחקר, מודל קטן וזול עם סקילים עקף מודל גדול בלי סקילים. לא תמיד צריך את המודל היקר.</span></div>' +
+      '<div style="background:var(--pink)"><strong>אבל לא קסם</strong><span style="font-size:17px">בחלק מהמשימות סקילים אפילו הזיקו. סקיל קצר וממוקד עובד יותר טוב מסקיל ארוך, ו־2–3 סקילים עדיפים על הרבה.</span></div></div>' +
+      '<p class="note" style="color:#ddd">מקורות: <a style="color:var(--yellow)" href="https://vals.ai/benchmarks/skillsbench" target="_blank" rel="noopener">Vals AI, SkillsBench</a> (עודכן 27.09.2026) · <a style="color:var(--yellow)" href="https://arxiv.org/html/2602.12670v1" target="_blank" rel="noopener">המאמר של SkillsBench</a> · <a style="color:var(--yellow)" href="https://evaluatingevals.substack.com/p/skillsbench-review" target="_blank" rel="noopener">ביקורת עצמאית על המבחן</a></p></section>' +
+      '<section class="box" style="background:var(--blue)"><h2>איך לבחור, בשורה אחת</h2><ul><li>עובדים במשרד, מסמכים ומיילים: כל אחד מהגדולים מספיק. בחרו את האפליקציה שנוח לכם, וודאו שהיא תומכת בסקילים.</li><li>משימות ארוכות או קוד: מודל חזק (Claude Opus, GPT-6, Gemini 4) שווה את זה.</li><li>הרבה בקשות קטנות או תקציב נמוך: מודל מהיר וזול עם סקיל טוב.</li></ul></section></div>';
   }
 
   /* ---------- updates & legal ---------- */
@@ -333,7 +420,7 @@
   }
 
   /* ---------- router ---------- */
-  var NAV = [['/', 'קטלוג'], ['/build', 'בנו לי סט'], ['/guides', 'מדריכים'], ['/updates', 'עדכונים']];
+  var NAV = [['/', 'קטלוג'], ['/build', 'בנו לי סט'], ['/guides', 'מדריכים'], ['/models', 'מודלים'], ['/updates', 'עדכונים']];
   function route(keepScroll) {
     var path = (location.hash || '#/').slice(1) || '/';
     var parts = path.split('/').filter(Boolean);
@@ -343,6 +430,8 @@
     else if (parts[0] === 'build') { html = build(); active = '/build'; title = 'בנו לי סט · SkillFit'; }
     else if (parts[0] === 'guides') { html = guides(); active = '/guides'; title = 'מדריכים · SkillFit'; }
     else if (parts[0] === 'guide') { html = guide(parts[1]); active = '/guides'; title = 'מדריך · SkillFit'; }
+    else if (parts[0] === 'students') { html = students(); active = '/guides'; title = 'סקילים לסטודנטים · SkillFit'; }
+    else if (parts[0] === 'models') { html = models(); active = '/models'; title = 'מודלים · SkillFit'; }
     else if (parts[0] === 'updates') { html = updates(); active = '/updates'; title = 'עדכונים · SkillFit'; }
     else if (parts[0] === 'legal') { html = legal(); active = ''; title = 'מידע משפטי · SkillFit'; }
     else html = notFound();
@@ -352,7 +441,7 @@
     $('#main').innerHTML = html;
     document.title = title;
     if (keepScroll !== true) {
-      if (parts[0] === 'legal' && parts[1]) {
+      if ((parts[0] === 'legal' || parts[0] === 'students') && parts[1]) {
         setTimeout(function () { var el = document.getElementById(parts[1]); if (el) el.scrollIntoView({ block: 'start' }); }, 30);
       } else window.scrollTo(0, 0);
     }
