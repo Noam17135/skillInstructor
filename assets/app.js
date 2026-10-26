@@ -436,7 +436,7 @@
       '<header class="mhead"><h2>' + esc(f.name) + '</h2><span>' + esc(f.by) + '</span></header>' +
       '<dl class="mfacts"><div><dt>איפה משתמשים</dt><dd>' + esc(f.where) + '</dd></div><div><dt>סקילים</dt><dd>' + esc(f.skills.replace(/^טוען סקילים: /, '')) + '</dd></div></dl>' +
       '<div class="mlist">' + f.models.map(function (m, i) {
-        return '<details class="mdl"' + (i === 0 ? ' open' : '') + '><summary><span class="mdl-top"><span class="mdl-n" dir="ltr">' + esc(m.n) + '</span><span class="mtag">' + esc(m.tag) + '</span></span>' +
+        return '<details class="mdl"><summary><span class="mdl-top"><span class="mdl-n" dir="ltr">' + esc(m.n) + '</span><span class="mtag">' + esc(m.tag) + '</span></span>' +
           '<span class="mdl-for">' + esc(m.for) + '</span>' + ICON.chev + '</summary>' +
           '<div class="mdl-body"><p class="mdl-about">' + esc(m.about) + '</p>' +
           '<div class="mdl-cols"><div><strong>מתאים ל</strong><ul class="ok">' + m.yes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
