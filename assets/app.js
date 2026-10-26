@@ -289,7 +289,7 @@
     if (!g) return notFound();
     return '<div class="wrap page" style="max-width:1000px;gap:28px;padding-top:12px"><a class="btn back" href="#/guides">' + ICON.back + 'כל המדריכים</a>' +
       '<article class="in" style="display:flex;flex-direction:column;gap:24px"><header class="box" style="background:' + g.color + ';box-shadow:10px 10px 0 var(--ink);border-radius:28px;padding:34px">' +
-      '<h1 style="font-size:clamp(38px,5.5vw,64px);line-height:1">' + esc(g.title) + '</h1><p style="font-size:20px;font-weight:500">' + esc(g.intro) + '</p><span style="font-size:14px;font-weight:700">עודכן: אוקטובר 2026</span></header>' +
+      '<h1 style="font-size:clamp(38px,5.5vw,64px);line-height:1">' + esc(g.title) + '</h1><p style="font-size:20px;font-weight:500">' + esc(g.intro) + '</p></header>' +
       g.items.map(function (it, i) {
         var s = byKey[it[0]]; if (!s) return '';
         return '<section class="box" style="flex-direction:row;flex-wrap:wrap;align-items:center;gap:18px;padding:26px;border-radius:24px"><span class="num" style="width:50px;height:50px;background:var(--yellow)">' + (i + 1) + '</span>' +
