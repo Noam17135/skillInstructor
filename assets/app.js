@@ -425,14 +425,8 @@
   ];
   var LVL = ['', 'נמוך', 'בינוני', 'גבוה'];
   var SPD = ['', 'איטי', 'בינוני', 'מהיר'];
-  function models() {
-    var f = MODELS.filter(function (m) { return m.id === st.mfam; })[0] || MODELS[0];
-    return '<div class="wrap page" style="max-width:980px"><section class="page-head in"><h1>מודלים, בפשטות</h1>' +
-      '<p class="lead" style="max-width:720px">בחרו משפחה, ופתחו מודל כדי לראות בשביל מה הוא בנוי ומתי לבחור בו.</p>' +
-      '<span class="note" style="font-weight:600">נכון לאוקטובר 2026. זה משתנה כל חודש.</span></section>' +
-      '<div class="mtabs" role="tablist" aria-label="משפחות מודלים">' + MODELS.map(function (m) {
-        return '<button type="button" role="tab" class="mtab" data-act="mfam" data-v="' + m.id + '" aria-selected="' + (m.id === f.id) + '"><span class="mdot" style="background:' + m.color + '"></span>' + esc(m.name) + '</button>'; }).join('') + '</div>' +
-      '<section class="mpanel in" role="tabpanel">' +
+  function modelPanel(f) {
+    return '<section class="mpanel" id="mpanel" role="tabpanel"><div class="mswap">' +
       '<header class="mhead"><h2>' + esc(f.name) + '</h2><span>' + esc(f.by) + '</span></header>' +
       '<dl class="mfacts"><div><dt>איפה משתמשים</dt><dd>' + esc(f.where) + '</dd></div><div><dt>סקילים</dt><dd>' + esc(f.skills.replace(/^טוען סקילים: /, '')) + '</dd></div></dl>' +
       '<div class="mlist">' + f.models.map(function (m, i) {
@@ -444,7 +438,16 @@
           (m.lim && m.lim.length ? '<p class="mdl-lim"><strong>שימו לב:</strong> ' + m.lim.map(esc).join(' ') + '</p>' : '') +
           '<p class="mdl-meta">מהירות: ' + SPD[m.speed] + ' · מחיר: ' + LVL[m.cost] + '</p></div></details>';
       }).join('') + '</div>' +
-      '</section>' +
+      '</div></section>';
+  }
+  function models() {
+    var f = MODELS.filter(function (m) { return m.id === st.mfam; })[0] || MODELS[0];
+    return '<div class="wrap page" style="max-width:980px"><section class="page-head in"><h1>מודלים, בפשטות</h1>' +
+      '<p class="lead" style="max-width:720px">בחרו משפחה, ופתחו מודל כדי לראות בשביל מה הוא בנוי ומתי לבחור בו.</p>' +
+      '<span class="note" style="font-weight:600">נכון לאוקטובר 2026. זה משתנה כל חודש.</span></section>' +
+      '<div class="mtabs" role="tablist" aria-label="משפחות מודלים">' + MODELS.map(function (m) {
+        return '<button type="button" role="tab" class="mtab" data-act="mfam" data-v="' + m.id + '" aria-selected="' + (m.id === f.id) + '"><span class="mdot" style="background:' + m.color + '"></span>' + esc(m.name) + '</button>'; }).join('') + '</div>' +
+      modelPanel(f) +
       '<section class="less"><h2>ואיך זה קשור לסקילים?</h2><div class="cols">' +
       '<div><strong>האפליקציה טוענת, המודל קורא</strong><span style="font-size:17px">סקיל הוא הוראות כתובות. האפליקציה (Claude, ChatGPT, Cursor) טוענת אותו, והמודל קורא ומבצע. לכן קודם בודקים שהאפליקציה תומכת בסקילים.</span></div>' +
       '<div><strong>סקיל טוב שווה הרבה</strong><span style="font-size:17px">במבחן SkillsBench, סקילים העלו את ההצלחה בכ־14.5 נקודות בממוצע. במחקר, מודל קטן עם סקילים עקף מודל גדול בלי סקילים.</span></div>' +
@@ -515,7 +518,22 @@
     else if (act === 'try') { st.q = v; st.need = 'all'; st.shown = 24; $('#q').value = v; refreshCatalog(); document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' }); }
     else if (act === 'clear') { st.q = ''; st.need = 'all'; var q = $('#q'); if (q) q.value = ''; refreshCatalog(); }
     else if (act === 'install') { st.install = !st.install; rerender(); if (st.install) { var ib = $('#installbox'); if (ib) ib.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }
-    else if (act === 'mfam') { st.mfam = v; rerender(); }
+    else if (act === 'mfam') {
+      if (st.mfam === v) return;
+      st.mfam = v;
+      var f = MODELS.filter(function (m) { return m.id === v; })[0];
+      document.querySelectorAll('.mtab').forEach(function (t) { t.setAttribute('aria-selected', String(t.getAttribute('data-v') === v)); });
+      var old = document.getElementById('mpanel');
+      if (old && f) {
+        var h = old.offsetHeight; old.style.minHeight = h + 'px';
+        old.classList.add('out');
+        setTimeout(function () {
+          var tmp = document.createElement('div'); tmp.innerHTML = modelPanel(f);
+          var nu = tmp.firstChild; nu.style.minHeight = h + 'px'; old.replaceWith(nu);
+          requestAnimationFrame(function () { nu.style.minHeight = ''; });
+        }, 140);
+      }
+    }
     else if (act === 'adv') { st.adv = !st.adv; rerender(); }
     else if (act === 'copy') { try { navigator.clipboard.writeText(v); } catch (x) {} b.textContent = 'הועתק'; }
     else if (act === 'tool') { st.tool = v; st.bq = $('#bq').value; rerender(); }

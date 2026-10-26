@@ -163,7 +163,7 @@ footer p{font-size:14px;line-height:1.6;color:var(--muted)}
 .mtab[aria-selected="true"]{background:var(--ink);color:#fff}
 .mdot{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);flex-shrink:0}
 .mtab[aria-selected="true"] .mdot{border-color:#fff}
-.mpanel{background:#fff;border:3px solid var(--ink);border-radius:26px;box-shadow:8px 8px 0 var(--ink);padding:32px;display:flex;flex-direction:column;gap:22px}
+.mpanel{background:#fff;border:3px solid var(--ink);border-radius:26px;box-shadow:8px 8px 0 var(--ink);padding:32px}
 .mhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
 .mhead h2{font-size:40px;line-height:1}
 .mhead span{font-size:16px;font-weight:700;color:var(--muted)}
@@ -192,3 +192,16 @@ details.mdl[open] summary svg{transform:rotate(180deg)}
 @media (max-width:600px){.mpanel{padding:22px}.mhead h2{font-size:32px}}
 .mdl-about{font-size:17px;line-height:1.65;max-width:760px}
 .mdl-lim{font-size:15px;line-height:1.55;padding:10px 14px;background:#FFF6D1;border-radius:12px}
+/* smoother model tabs */
+.mtab{transition:background-color .2s ease,color .2s ease,transform .15s ease,box-shadow .2s ease}
+.mtab:hover{transform:translateY(-2px)}
+.mtab[aria-selected="true"]{box-shadow:3px 3px 0 var(--ink)}
+.mpanel{transition:min-height .25s ease}
+.mswap{display:flex;flex-direction:column;gap:22px;animation:mfade .32s cubic-bezier(.2,.8,.2,1) both}
+.mpanel.out .mswap{animation:mfadeout .14s ease both}
+@keyframes mfade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes mfadeout{to{opacity:0;transform:translateY(-6px)}}
+details.mdl[open] .mdl-body{animation:mopen .28s ease both}
+@keyframes mopen{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+details.mdl summary{transition:background-color .15s ease;border-radius:12px}
+details.mdl summary:hover{background:#FAFAFA}
