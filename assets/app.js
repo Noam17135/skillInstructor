@@ -253,10 +253,11 @@
           (f === 0 ? 'לא מוזכר בתיעוד שעובד עם ' + esc(st.tool) + '.' : 'עוד לא בדקנו אם הוא עובד עם ' + esc(st.tool) + '.') + '</span>' : '') +
         '<a class="btn yellow" style="align-self:flex-start;margin-top:auto;min-height:46px" href="#/skill/' + esc(s.id) + '">לעמוד הסקיל</a></div>';
     }).join('') + '</div>';
-    if (r.skipped.length) h += '<div class="box" style="background:var(--red)"><strong style="font-family:var(--head);font-weight:400;font-size:26px">לא הוספנו, כי זה חופף</strong>' + r.skipped.map(function (k) {
-      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:17px"><a class="btn" style="min-height:44px;padding:0 14px;border-width:2px;border-radius:12px" href="#/skill/' + esc(k.s.id) + '">' + esc(k.s.title) + '</a><span>עושה כמעט אותו דבר כמו ״' + esc(k.instead.title) + '״. מספיק אחד.</span></div>';
+    if (r.skipped.length) h += '<div class="box" style="background:var(--cream);gap:10px;padding:22px 26px"><strong style="font-size:19px">גם אלה מתאימים, אבל לא הוספנו אותם</strong>' +
+      '<span style="font-size:16px;color:var(--muted)">כל אחד מהם עושה כמעט אותו דבר כמו סקיל שכבר בסט. שני סקילים לאותה משימה רק מבלבלים את ה־AI.</span>' + r.skipped.map(function (k) {
+      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:16px"><a href="#/skill/' + esc(k.s.id) + '" style="font-weight:700">' + esc(k.s.title) + '</a><span>במקום ״' + esc(k.instead.title) + '״</span></div>';
     }).join('') + '</div>';
-    if (r.leftover.length) h += '<div class="box" style="background:var(--blue)"><strong style="font-family:var(--head);font-weight:400;font-size:24px">את זה עוד לא הצלחתי לשייך</strong><span style="font-size:17px">' + esc(r.leftover.slice(0, 8).join(', ')) + '. אם זה חשוב, ספרו לנו דרך הטופס בתחתית הקטלוג, או נסו לנסח אחרת.</span></div>';
+    if (r.leftover.length >= 2) h += '<p class="note" style="font-size:15px">מילים שלא שייכנו לאף סקיל: ' + esc(r.leftover.slice(0, 6).join(', ')) + '. אם זה צורך חשוב, נסו לנסח אותו כמשימה.</p>';
     h += '<div class="box" style="background:var(--ink);color:#fff;border-color:var(--ink)"><strong style="font-family:var(--head);font-weight:400;font-size:26px;color:var(--yellow)">איך מתקינים סט</strong><span style="font-size:17px">אחד־אחד, מהעמוד של כל סקיל. מתחילים מזה שתשתמשו בו הכי הרבה, ובודקים אותו לפני שמוסיפים את הבא.</span></div>';
     h += askAI(text, st.tool) + '</section>';
     return h;
@@ -410,7 +411,7 @@
       '<div class="mtabs" role="tablist" aria-label="משפחות מודלים">' + MODELS.map(function (m) {
         return '<button type="button" role="tab" class="chip" data-act="mfam" data-v="' + m.id + '" aria-selected="' + (m.id === f.id) + '" aria-pressed="' + (m.id === f.id) + '" style="background:' + m.color + '">' + esc(m.name) + '</button>'; }).join('') + '</div>' +
       '<section class="box shadow in" role="tabpanel" style="gap:18px;border-top:10px solid ' + f.color + '">' +
-      '<div class="row-chips" style="justify-content:space-between"><h2 style="font-size:40px">' + esc(f.name) + ' <span style="font-family:'Assistant',Tahoma,sans-serif;font-size:18px;font-weight:700;color:var(--muted)">· ' + esc(f.by) + '</span></h2></div>' +
+      '<div class="row-chips" style="justify-content:space-between"><h2 style="font-size:40px">' + esc(f.name) + ' <span style="font-family:inherit;font-size:18px;font-weight:700;color:var(--muted)">· ' + esc(f.by) + '</span></h2></div>' +
       '<span style="font-size:16px"><strong>איפה משתמשים:</strong> ' + esc(f.where) + '</span>' +
       '<span style="font-size:16px"><strong>סקילים:</strong> ' + esc(f.skills.replace(/^טוען סקילים: /, '')) + '</span>' +
       '<div style="display:flex;flex-direction:column;gap:12px">' + f.models.map(function (m, i) {
