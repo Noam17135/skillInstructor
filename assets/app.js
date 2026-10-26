@@ -398,28 +398,26 @@
           yes: ['ארגונים שמעדיפים ספק אירופאי', 'עבודה בהרבה שפות'], no: ['עדיין בגרסת תצוגה מקדימה'] }
       ] }
   ];
-  function meter(n, label) {
-    var d = ''; for (var i = 1; i <= 3; i++) d += '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);background:' + (i <= n ? 'var(--ink)' : '#fff') + '"></span>';
-    return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:700" aria-label="' + label + ' ' + n + ' מתוך 3">' + label + ' ' + d + '</span>';
-  }
+  var LVL = ['', 'נמוך', 'בינוני', 'גבוה'];
+  var SPD = ['', 'איטי', 'בינוני', 'מהיר'];
   function models() {
     var f = MODELS.filter(function (m) { return m.id === st.mfam; })[0] || MODELS[0];
-    return '<div class="wrap page" style="max-width:1100px"><section class="page-head in"><h1>מודלים, בפשטות</h1>' +
-      '<p class="lead" style="max-width:760px">בחרו משפחה, ופתחו מודל כדי לראות בשביל מה הוא באמת בנוי, מתי לבחור בו ומתי לא.</p>' +
-      '<span class="dark-tag" style="align-self:flex-start;padding:5px 14px;font-size:15px">נכון לאוקטובר 2026. זה משתנה כל חודש.</span></section>' +
+    return '<div class="wrap page" style="max-width:980px"><section class="page-head in"><h1>מודלים, בפשטות</h1>' +
+      '<p class="lead" style="max-width:720px">בחרו משפחה, ופתחו מודל כדי לראות בשביל מה הוא בנוי ומתי לבחור בו.</p>' +
+      '<span class="note" style="font-weight:600">נכון לאוקטובר 2026. זה משתנה כל חודש.</span></section>' +
       '<div class="mtabs" role="tablist" aria-label="משפחות מודלים">' + MODELS.map(function (m) {
-        return '<button type="button" role="tab" class="chip" data-act="mfam" data-v="' + m.id + '" aria-selected="' + (m.id === f.id) + '" aria-pressed="' + (m.id === f.id) + '" style="background:' + m.color + '">' + esc(m.name) + '</button>'; }).join('') + '</div>' +
-      '<section class="box shadow in" role="tabpanel" style="gap:18px;border-top:10px solid ' + f.color + '">' +
-      '<div class="row-chips" style="justify-content:space-between"><h2 style="font-size:40px">' + esc(f.name) + ' <span style="font-family:inherit;font-size:18px;font-weight:700;color:var(--muted)">· ' + esc(f.by) + '</span></h2></div>' +
-      '<span style="font-size:16px"><strong>איפה משתמשים:</strong> ' + esc(f.where) + '</span>' +
-      '<span style="font-size:16px"><strong>סקילים:</strong> ' + esc(f.skills.replace(/^טוען סקילים: /, '')) + '</span>' +
-      '<div style="display:flex;flex-direction:column;gap:12px">' + f.models.map(function (m, i) {
-        return '<details class="mdl"' + (i === 0 ? ' open' : '') + '><summary><span class="mdl-n" dir="ltr">' + esc(m.n) + '</span><span class="tag" style="background:' + f.color + '">' + esc(m.tag) + '</span><span class="mdl-for">' + esc(m.for) + '</span>' + ICON.chev + '</summary>' +
-          '<div class="mdl-body"><div class="row-chips">' + meter(m.speed, 'מהירות') + meter(m.cost, 'מחיר') + '</div>' +
-          '<div class="two"><div style="background:#E9F9E5"><strong>תבחרו בו כש...</strong><ul>' + m.yes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
-          '<div style="background:#FFEDED"><strong>פחות מתאים כש...</strong><ul>' + m.no.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div></div></div></details>';
+        return '<button type="button" role="tab" class="mtab" data-act="mfam" data-v="' + m.id + '" aria-selected="' + (m.id === f.id) + '"><span class="mdot" style="background:' + m.color + '"></span>' + esc(m.name) + '</button>'; }).join('') + '</div>' +
+      '<section class="mpanel in" role="tabpanel">' +
+      '<header class="mhead"><h2>' + esc(f.name) + '</h2><span>' + esc(f.by) + '</span></header>' +
+      '<dl class="mfacts"><div><dt>איפה משתמשים</dt><dd>' + esc(f.where) + '</dd></div><div><dt>סקילים</dt><dd>' + esc(f.skills.replace(/^טוען סקילים: /, '')) + '</dd></div></dl>' +
+      '<div class="mlist">' + f.models.map(function (m, i) {
+        return '<details class="mdl"' + (i === 0 ? ' open' : '') + '><summary><span class="mdl-top"><span class="mdl-n" dir="ltr">' + esc(m.n) + '</span><span class="mtag">' + esc(m.tag) + '</span></span>' +
+          '<span class="mdl-for">' + esc(m.for) + '</span>' + ICON.chev + '</summary>' +
+          '<div class="mdl-body"><div class="mdl-cols"><div><strong>מתאים ל</strong><ul class="ok">' + m.yes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
+          '<div><strong>פחות מתאים ל</strong><ul class="nope">' + m.no.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div></div>' +
+          '<p class="mdl-meta">מהירות: ' + SPD[m.speed] + ' · מחיר: ' + LVL[m.cost] + '</p></div></details>';
       }).join('') + '</div>' +
-      '<span class="note">מקורות: ' + f.src.map(function (x) { return '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>'; }).join(' · ') + '. התיאורים מבוססים בעיקר על מה שהחברות עצמן כותבות.</span></section>' +
+      '<p class="note">מקורות: ' + f.src.map(function (x) { return '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>'; }).join(' · ') + '. התיאורים מבוססים בעיקר על מה שהחברות עצמן כותבות.</p></section>' +
       '<section class="less"><h2>ואיך זה קשור לסקילים?</h2><div class="cols">' +
       '<div><strong>האפליקציה טוענת, המודל קורא</strong><span style="font-size:17px">סקיל הוא הוראות כתובות. האפליקציה (Claude, ChatGPT, Cursor) טוענת אותו, והמודל קורא ומבצע. לכן קודם בודקים שהאפליקציה תומכת בסקילים.</span></div>' +
       '<div><strong>סקיל טוב שווה הרבה</strong><span style="font-size:17px">במבחן SkillsBench, סקילים העלו את ההצלחה בכ־14.5 נקודות בממוצע. במחקר, מודל קטן עם סקילים עקף מודל גדול בלי סקילים.</span></div>' +
