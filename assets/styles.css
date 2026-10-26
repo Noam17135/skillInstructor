@@ -158,3 +158,15 @@ footer p{font-size:14px;line-height:1.6;color:var(--muted)}
 }
 .understood{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:18px;font-weight:700}
 .understood .tag{font-size:16px;padding:6px 14px;animation:bubble .35s ease both}
+.mtabs{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:thin}
+.mtabs .chip{flex-shrink:0;min-height:50px;font-size:17px}
+details.mdl{border:3px solid var(--ink);border-radius:18px;background:#fff;overflow:hidden}
+details.mdl summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:16px 18px;min-height:56px}
+details.mdl summary::-webkit-details-marker{display:none}
+details.mdl summary svg{margin-inline-start:auto;transition:transform .2s ease;flex-shrink:0}
+details.mdl[open] summary svg{transform:rotate(180deg)}
+details.mdl[open] summary{border-bottom:2px dashed var(--ink)}
+.mdl-n{font-family:var(--head);font-size:24px}
+.mdl-for{flex:1 1 260px;font-size:16px;font-weight:500}
+.mdl-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.mdl-body .two>div{border-width:2px}

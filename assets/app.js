@@ -73,7 +73,7 @@
   var mark = function (d) { return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"></path></svg>'; };
 
   var S = [], byId = {}, byKey = {}, byOv = {};
-  var st = { q: '', need: 'all', level: 'everyday', shown: 24, bq: '', built: '', tool: '', install: false, adv: false };
+  var st = { mfam: 'claude', q: '', need: 'all', level: 'everyday', shown: 24, bq: '', built: '', tool: '', install: false, adv: false };
 
   /* ---------- search ---------- */
   var engine = null;
@@ -327,64 +327,104 @@
   }
 
   /* ---------- models ---------- */
+  // speed/cost: 1 = low, 3 = high. Based on the providers' own descriptions (October 2026).
   var MODELS = [
-    { name: 'Claude', by: 'Anthropic', color: '#FFB86B', where: 'אפליקציית Claude, Claude Code',
-      tiers: [['Fable 5.1', 'הכי חזק, אבל איטי ויקר'], ['Opus 5.5', 'חזק מאוד, וההמלצה של Anthropic להתחיל ממנו'], ['Sonnet 5.5', 'מהיר וחכם, האיזון הטוב'], ['Haiku 5.5', 'הכי מהיר וזול']],
-      good: ['משימות ארוכות שרצות שעות, בעיקר קוד', 'מסיים עבודה עד קובץ אמיתי: מסמך, גיליון או מצגת', 'קורא מסמכים ארוכים מאוד'],
-      skills: 'כן. באפליקציה, ב־Claude Code וב־API. Anthropic גם יצרה את פורמט הסקילים.',
-      src: [['מדריך בחירת מודל', 'https://platform.claude.com/docs/en/about-claude/models/choosing-a-model'], ['סקילים באפליקציה', 'https://support.claude.com/en/articles/12512176-what-are-skills']] },
-    { name: 'ChatGPT', by: 'OpenAI', color: '#9BE38A', where: 'ChatGPT, Codex',
-      tiers: [['GPT-6 Astra', 'הכי חזק, במסלולים בתשלום'], ['GPT-6.1 Sol', 'קרוב לחזק, וזול יותר'], ['GPT-6 Luna', 'הכי מהיר וזול. בחשבון חינמי מקבלים כרגע את GPT-5.6 Luna']],
-      good: ['עבודה במחשב ובדפדפן בשבילך', 'שואל שאלות הבהרה ממוקדות', 'הדגמים הזולים טובים מאוד ביחס למחיר'],
-      skills: 'כן. ב־ChatGPT (בסביבות עבודה) וב־Codex.',
-      src: [['GPT-6 Astra', 'https://openai.com/index/gpt-6-astra/'], ['מודלים ב־ChatGPT', 'https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt'], ['סקילים ב־ChatGPT', 'https://openai.com/academy/skills/']] },
-    { name: 'Gemini', by: 'Google', color: '#7CD8FF', where: 'אפליקציית Gemini, חיפוש Google, Gemini CLI',
-      tiers: [['Gemini 4 Argon', 'הכי חזק, במסלולי Pro ו־Ultra'], ['Gemini 3.8 Flash', 'מהיר וזול, טוב לקוד ולסוכנים'], ['Gemma 4', 'מודל פתוח שרץ גם על טלפון, בלי אינטרנט']],
-      good: ['מבין טקסט, תמונות, קול וגם וידאו', 'קורא מסמכים ארוכים מאוד', 'מחובר לשירותים של Google'],
-      skills: 'כן. באפליקציה (סקילים מחליפים את ה־Gems, ואפשר לייבא קובצי SKILL.md) וב־Gemini CLI.',
-      src: [['Gemini 4 Argon', 'https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/'], ['סקילים ב־Gemini', 'https://support.google.com/gemini/answer/18560919']] },
-    { name: 'Grok', by: 'xAI', color: '#E6E6E6', where: 'אפליקציית Grok, X, Grok Build',
-      tiers: [['Grok 4.7', 'המודל החזק שלהם לקוד ולעבודה משרדית']],
-      good: ['מחיר טוב ביחס לביצועים בקוד', 'עבודה עם Excel, PowerPoint ו־Word'],
+    { id: 'claude', name: 'Claude', by: 'Anthropic', color: '#FFB86B', where: 'אפליקציית Claude, Claude Code',
+      skills: 'טוען סקילים: כן, באפליקציה, ב־Claude Code וב־API.',
+      src: [['מדריך בחירת מודל', 'https://platform.claude.com/docs/en/about-claude/models/choosing-a-model'], ['סקילים באפליקציה', 'https://support.claude.com/en/articles/12512176-what-are-skills']],
+      models: [
+        { n: 'Fable 5.1', tag: 'הכי חזק', speed: 1, cost: 3, for: 'הבעיות הכי קשות, כשאיכות התשובה חשובה יותר מהזמן ומהמחיר.',
+          yes: ['ניתוח מורכב שדורש חשיבה עמוקה', 'בעיה שמודלים אחרים לא פתרו'], no: ['שאלות יומיומיות ותשובות מהירות', 'עבודה בכמויות גדולות, כי הוא איטי ויקר'] },
+        { n: 'Opus 5.5', tag: 'נקודת התחלה מומלצת', speed: 2, cost: 2, for: 'עבודה ארוכה שרצה לבד: פרויקט קוד גדול, או ניתוח שמסתיים במסמך, גיליון או מצגת.',
+          yes: ['משימות של כמה שעות עם הרבה שלבים', 'כשרוצים תוצר מוגמר ולא רק תשובה'], no: ['צ׳אט קצר ופשוט, שם הוא יותר ממה שצריך'] },
+        { n: 'Sonnet 5.5', tag: 'האיזון הטוב', speed: 3, cost: 2, for: 'עבודה יומיומית שצריכה להיות גם חכמה וגם מהירה.',
+          yes: ['כתיבה, סיכומים ועבודה עם קבצים', 'קוד יומיומי'], no: ['משימות ארוכות מאוד שדורשות את החשיבה העמוקה ביותר'] },
+        { n: 'Haiku 5.5', tag: 'הכי מהיר וזול', speed: 3, cost: 1, for: 'הרבה משימות קטנות מהר, וכשהתקציב חשוב.',
+          yes: ['מיון, תיוג ותשובות קצרות', 'אוטומציות שרצות הרבה פעמים ביום'], no: ['ניתוח מורכב או כתיבה ארוכה ומדויקת'] }
+      ] },
+    { id: 'openai', name: 'ChatGPT', by: 'OpenAI', color: '#9BE38A', where: 'ChatGPT, Codex',
+      skills: 'טוען סקילים: כן, ב־ChatGPT (בסביבות עבודה) וב־Codex.',
+      src: [['GPT-6 Astra', 'https://openai.com/index/gpt-6-astra/'], ['מודלים ב־ChatGPT', 'https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt'], ['סקילים', 'https://openai.com/academy/skills/']],
+      models: [
+        { n: 'GPT-6 Astra', tag: 'הכי חזק', speed: 2, cost: 3, for: 'עבודה מקצועית קשה, ועבודה במחשב ובדפדפן בשבילך.',
+          yes: ['משימות שדורשות לגלוש, ללחוץ ולמלא דברים בשבילך', 'פרויקטי קוד ועבודה מקצועית מורכבת'], no: ['שימוש יומיומי פשוט, שם הוא יקר מדי', 'זמין רק במסלולים בתשלום'] },
+        { n: 'GPT-6.1 Sol', tag: 'מאוזן', speed: 2, cost: 2, for: 'כמעט כמו Astra, במחיר נמוך יותר.',
+          yes: ['רוב העבודה היומיומית: כתיבה, ניתוח וקוד'], no: ['המשימות הכי קשות'] },
+        { n: 'GPT-6.1 Terra', tag: 'מהיר', speed: 3, cost: 2, for: 'עבודה מהירה עם תמונות, מחשב וכתיבה.',
+          yes: ['הבנת צילומי מסך ותמונות', 'כתיבה מהירה'], no: ['חשיבה ארוכה ומעמיקה'] },
+        { n: 'GPT-6 Luna', tag: 'הכי מהיר וזול', speed: 3, cost: 1, for: 'הרבה בקשות קטנות במחיר נמוך מאוד. בחשבון חינמי מקבלים כרגע את GPT-5.6 Luna.',
+          yes: ['תשובות מהירות', 'אוטומציות בכמויות גדולות'], no: ['משימות מורכבות שדורשות דיוק גבוה'] }
+      ] },
+    { id: 'gemini', name: 'Gemini', by: 'Google', color: '#7CD8FF', where: 'אפליקציית Gemini, חיפוש Google, Gemini CLI',
+      skills: 'טוען סקילים: כן. באפליקציה (סקילים מחליפים את ה־Gems, ואפשר לייבא קובצי SKILL.md) וב־Gemini CLI.',
+      src: [['Gemini 4 Argon', 'https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/'], ['כרטיסי מודלים', 'https://deepmind.google/models/model-cards/'], ['סקילים ב־Gemini', 'https://support.google.com/gemini/answer/18560919']],
+      models: [
+        { n: 'Gemini 4 Argon', tag: 'הכי חזק', speed: 2, cost: 3, for: 'עבודה מקצועית קשה, וגם הבנה של וידאו ארוך.',
+          yes: ['ניתוח של וידאו, תמונות וקול', 'עבודה עסקית, משפטית ופיננסית', 'מסמכים ארוכים מאוד'], no: ['לפי Google הוא עלול לפעמים להיות איטי', 'זמין רק במסלולי Pro ו־Ultra'] },
+        { n: 'Gemini 3.8 Flash', tag: 'מהיר וזול', speed: 3, cost: 1, for: 'סוס העבודה: קוד וסוכנים, במהירות ובמחיר נמוך.',
+          yes: ['עבודה יומיומית מהירה', 'סוכנים שרצים הרבה'], no: ['המשימות הכי קשות'] },
+        { n: 'Gemini 3.5 Flash-Lite', tag: 'הכי זול', speed: 3, cost: 1, for: 'משימות פשוטות בכמויות גדולות מאוד.',
+          yes: ['מיון וסיכום קצר של הרבה טקסט'], no: ['כל דבר שדורש חשיבה'] },
+        { n: 'Gemma 4', tag: 'פתוח, רץ אצלך', speed: 2, cost: 1, for: 'מודל פתוח שהגרסאות הקטנות שלו רצות על טלפון או מחשב, גם בלי אינטרנט.',
+          yes: ['פרטיות, כשלא רוצים לשלוח מידע לענן', 'עבודה בלי חיבור'], no: ['משימות שדורשות את החוזק של מודלי הענן'] }
+      ] },
+    { id: 'grok', name: 'Grok', by: 'xAI', color: '#E6E6E6', where: 'אפליקציית Grok, X, Grok Build',
       skills: 'ל־Grok Build יש "skills", אבל לא מצאנו אישור שזה אותו פורמט.',
-      src: [['Grok 4.7', 'https://x.ai/news/grok-4-7']] },
-    { name: 'Meta AI', by: 'Meta', color: '#D7B8FF', where: 'WhatsApp, Instagram, Facebook, אפליקציית Meta AI',
-      tiers: [['Muse Wonder', 'המודל החזק החדש, לסוכנים'], ['Muse Spark', 'קטן ומהיר, מאחורי Meta AI באפליקציות']],
-      good: ['כבר נמצא באפליקציות שכולם משתמשים בהן', 'מבין תמונות ומצלמה'],
+      src: [['Grok 4.7', 'https://x.ai/news/grok-4-7']],
+      models: [
+        { n: 'Grok 4.7', tag: 'המודל העיקרי', speed: 2, cost: 2, for: 'קוד ועבודה משרדית במחיר טוב.',
+          yes: ['קוד, כשהמחיר חשוב', 'עבודה עם Excel, PowerPoint ו־Word'], no: ['לפי הגרפים של xAI עצמה, הוא מאחורי המודלים המובילים ברוב המבחנים'] }
+      ] },
+    { id: 'meta', name: 'Meta AI', by: 'Meta', color: '#D7B8FF', where: 'WhatsApp, Instagram, Facebook, אפליקציית Meta AI',
       skills: 'לא מצאנו תמיכה בסקילים.',
-      src: [['Muse Wonder', 'https://about.fb.com/news/2026/10/introducing-muse-wonder-models/']] },
-    { name: 'מודלים פתוחים', by: 'DeepSeek · Qwen · Mistral', color: '#FFC2D1', where: 'כל אחד יכול להוריד ולהריץ, או דרך האתרים שלהם',
-      tiers: [['DeepSeek V4', 'זול מאוד וחזק בקוד'], ['Qwen 3.8', 'יש גרסה פתוחה בגודל שאפשר להריץ על מחשב חזק'], ['Mistral Large 4', 'אירופאי, תומך בהרבה שפות']],
-      good: ['זולים, ואפשר להריץ אותם על שרת משלך', 'במבחן הסקילים, DeepSeek Flash הגיע למקום הראשון'],
-      skills: 'למודל עצמו אין סקילים. אפשר להשתמש בו בתוך כלי שתומך בסקילים, כמו Codex או Cursor.',
-      src: [['DeepSeek', 'https://api-docs.deepseek.com/news/news261017/'], ['Qwen', 'https://github.com/QwenLM/Qwen3.8'], ['Mistral Large 4', 'https://mistral.ai/news/mistral-large-4/']] }
+      src: [['Muse Wonder', 'https://about.fb.com/news/2026/10/introducing-muse-wonder-models/'], ['Muse Spark', 'https://about.fb.com/news/2026/04/introducing-muse-spark-meta-superintelligence-labs/']],
+      models: [
+        { n: 'Muse Wonder', tag: 'הכי חזק', speed: 2, cost: 3, for: 'סוכן שמבצע משימות בשבילך, למשל תביעת ביטוח, חוזה שכירות או סידור כספים.',
+          yes: ['משימות עם כמה שלבים בחיים האישיים'], no: ['כרגע זמין בעיקר למפתחים, ובהמשך למנויים'] },
+        { n: 'Muse Spark', tag: 'קטן ומהיר', speed: 3, cost: 1, for: 'העוזר שכבר נמצא בתוך WhatsApp, Instagram ומשקפי Meta.',
+          yes: ['שאלות מהירות באמצע היום', 'הבנת תמונות ומה שהמצלמה רואה'], no: ['עבודה מקצועית ארוכה'] }
+      ] },
+    { id: 'open', name: 'מודלים פתוחים', by: 'DeepSeek · Qwen · Mistral', color: '#FFC2D1', where: 'האתרים והאפליקציות שלהם, או להריץ על שרת משלך',
+      skills: 'למודל עצמו אין סקילים. משתמשים בו בתוך כלי שתומך בסקילים, כמו Codex או Cursor.',
+      src: [['DeepSeek', 'https://api-docs.deepseek.com/news/news261017/'], ['Qwen', 'https://github.com/QwenLM/Qwen3.8'], ['Mistral Large 4', 'https://mistral.ai/news/mistral-large-4/'], ['SkillsBench', 'https://vals.ai/benchmarks/skillsbench']],
+      models: [
+        { n: 'DeepSeek V4-Pro', tag: 'פתוח וחזק', speed: 2, cost: 1, for: 'קוד וסוכנים, עם משקלים פתוחים שכל אחד יכול להוריד.',
+          yes: ['ארגון שרוצה להריץ מודל חזק על השרתים שלו'], no: ['הוא ענק, ולא ירוץ על מחשב רגיל'] },
+        { n: 'DeepSeek V4.1 Flash', tag: 'זול מאוד', speed: 3, cost: 1, for: 'עבודה מהירה במחיר נמוך מאוד. במבחן הסקילים SkillsBench הוא הגיע למקום הראשון.',
+          yes: ['הרבה משימות עם סקילים, בתקציב קטן'], no: ['גם הוא גדול מדי למחשב ביתי'] },
+        { n: 'Qwen 3.8', tag: 'יש גרסה שרצה אצלך', speed: 2, cost: 1, for: 'סוכנים ואוטומציה משרדית, בהרבה שפות. הגרסה בגודל 27B ניתנת להרצה על מחשב עם כרטיס מסך חזק.',
+          yes: ['להריץ מודל מקומי בלי לשלוח מידע החוצה'], no: ['גרסת ה־Max החזקה סגורה, לא פתוחה'] },
+        { n: 'Mistral Large 4', tag: 'אירופאי', speed: 2, cost: 2, for: 'מודל אירופאי, רב־לשוני, עם משקלים פתוחים שהובטחו.',
+          yes: ['ארגונים שמעדיפים ספק אירופאי', 'עבודה בהרבה שפות'], no: ['עדיין בגרסת תצוגה מקדימה'] }
+      ] }
   ];
+  function meter(n, label) {
+    var d = ''; for (var i = 1; i <= 3; i++) d += '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);background:' + (i <= n ? 'var(--ink)' : '#fff') + '"></span>';
+    return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:700" aria-label="' + label + ' ' + n + ' מתוך 3">' + label + ' ' + d + '</span>';
+  }
   function models() {
+    var f = MODELS.filter(function (m) { return m.id === st.mfam; })[0] || MODELS[0];
     return '<div class="wrap page" style="max-width:1100px"><section class="page-head in"><h1>מודלים, בפשטות</h1>' +
-      '<p class="lead" style="max-width:760px">מי המודלים, במה כל אחד טוב, ואיך זה קשור לסקילים. בלי מילים גבוהות.</p>' +
+      '<p class="lead" style="max-width:760px">בחרו משפחה, ופתחו מודל כדי לראות בשביל מה הוא באמת בנוי, מתי לבחור בו ומתי לא.</p>' +
       '<span class="dark-tag" style="align-self:flex-start;padding:5px 14px;font-size:15px">נכון לאוקטובר 2026. זה משתנה כל חודש.</span></section>' +
-      '<section class="steps3">' +
-      step('#FFFFFF', '🧠', 'המודל', 'המוח. הוא קורא, חושב וכותב. Claude, GPT, Gemini.') +
-      step('#9BE38A', '📱', 'האפליקציה', 'המקום שבו עובדים עם המוח: ChatGPT, Claude, Cursor. היא זו שטוענת את הסקילים.') +
-      step('#FFB86B', '📋', 'הסקיל', 'מתכון. הוראות כתובות שהמודל קורא כשהן רלוונטיות.') + '</section>' +
-      '<p style="font-size:19px;line-height:1.6;max-width:820px">לכן השאלה הראשונה היא לא איזה מודל, אלא <strong>האם האפליקציה שלך תומכת בסקילים</strong>. אותו סקיל עובד ב־Claude, ב־ChatGPT וב־Codex, ב־Gemini, ב־Copilot וב־Cursor.</p>' +
-      '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:24px">' + MODELS.map(function (m, i) {
-        return '<article class="card ' + TILTS[i % 4] + '" style="cursor:default;gap:12px;animation-delay:' + i * 0.05 + 's">' +
-          '<div class="row"><span class="t" style="font-size:30px">' + esc(m.name) + '</span><span class="tag" style="background:' + m.color + '">' + esc(m.by) + '</span></div>' +
-          '<span style="font-size:15px;color:var(--muted);font-weight:600">איפה משתמשים: ' + esc(m.where) + '</span>' +
-          '<div style="display:flex;flex-direction:column;gap:6px">' + m.tiers.map(function (t) {
-            return '<div style="display:flex;gap:8px;align-items:baseline;font-size:16px"><strong style="white-space:nowrap" dir="ltr">' + esc(t[0]) + '</strong><span>' + esc(t[1]) + '</span></div>'; }).join('') + '</div>' +
-          '<div style="padding:12px 14px;background:var(--cream);border:2px solid var(--ink);border-radius:14px"><strong style="font-size:15px">במה הוא טוב</strong><ul style="margin:6px 0 0;padding:0 18px 0 0;font-size:15px;display:flex;flex-direction:column;gap:4px">' +
-          m.good.map(function (g) { return '<li>' + esc(g) + '</li>'; }).join('') + '</ul></div>' +
-          '<span style="font-size:15px"><strong>סקילים: </strong>' + esc(m.skills) + '</span>' +
-          '<span class="note" style="margin-top:auto">מקורות: ' + m.src.map(function (x) { return '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>'; }).join(' · ') + '</span></article>';
+      '<div class="mtabs" role="tablist" aria-label="משפחות מודלים">' + MODELS.map(function (m) {
+        return '<button type="button" role="tab" class="chip" data-act="mfam" data-v="' + m.id + '" aria-selected="' + (m.id === f.id) + '" aria-pressed="' + (m.id === f.id) + '" style="background:' + m.color + '">' + esc(m.name) + '</button>'; }).join('') + '</div>' +
+      '<section class="box shadow in" role="tabpanel" style="gap:18px;border-top:10px solid ' + f.color + '">' +
+      '<div class="row-chips" style="justify-content:space-between"><h2 style="font-size:40px">' + esc(f.name) + ' <span style="font-family:'Assistant',Tahoma,sans-serif;font-size:18px;font-weight:700;color:var(--muted)">· ' + esc(f.by) + '</span></h2></div>' +
+      '<span style="font-size:16px"><strong>איפה משתמשים:</strong> ' + esc(f.where) + '</span>' +
+      '<span style="font-size:16px"><strong>סקילים:</strong> ' + esc(f.skills.replace(/^טוען סקילים: /, '')) + '</span>' +
+      '<div style="display:flex;flex-direction:column;gap:12px">' + f.models.map(function (m, i) {
+        return '<details class="mdl"' + (i === 0 ? ' open' : '') + '><summary><span class="mdl-n" dir="ltr">' + esc(m.n) + '</span><span class="tag" style="background:' + f.color + '">' + esc(m.tag) + '</span><span class="mdl-for">' + esc(m.for) + '</span>' + ICON.chev + '</summary>' +
+          '<div class="mdl-body"><div class="row-chips">' + meter(m.speed, 'מהירות') + meter(m.cost, 'מחיר') + '</div>' +
+          '<div class="two"><div style="background:#E9F9E5"><strong>תבחרו בו כש...</strong><ul>' + m.yes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
+          '<div style="background:#FFEDED"><strong>פחות מתאים כש...</strong><ul>' + m.no.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div></div></div></details>';
       }).join('') + '</div>' +
-      '<section class="less"><h2>אז המודל משנה?</h2><div class="cols">' +
-      '<div><strong>סקיל עוזר כמעט לכל מודל</strong><span style="font-size:17px">במבחן SkillsBench, הוספת סקילים העלתה את ההצלחה בכ־14.5 נקודות בממוצע, גם למודלים חזקים וגם לחלשים.</span></div>' +
-      '<div><strong>סקיל טוב לפעמים שווה יותר ממודל גדול</strong><span style="font-size:17px">במחקר, מודל קטן וזול עם סקילים עקף מודל גדול בלי סקילים. לא תמיד צריך את המודל היקר.</span></div>' +
-      '<div style="background:var(--pink)"><strong>אבל לא קסם</strong><span style="font-size:17px">בחלק מהמשימות סקילים אפילו הזיקו. סקיל קצר וממוקד עובד יותר טוב מסקיל ארוך, ו־2–3 סקילים עדיפים על הרבה.</span></div></div>' +
-      '<p class="note" style="color:#ddd">מקורות: <a style="color:var(--yellow)" href="https://vals.ai/benchmarks/skillsbench" target="_blank" rel="noopener">Vals AI, SkillsBench</a> (עודכן 27.09.2026) · <a style="color:var(--yellow)" href="https://arxiv.org/html/2602.12670v1" target="_blank" rel="noopener">המאמר של SkillsBench</a> · <a style="color:var(--yellow)" href="https://evaluatingevals.substack.com/p/skillsbench-review" target="_blank" rel="noopener">ביקורת עצמאית על המבחן</a></p></section>' +
-      '<section class="box" style="background:var(--blue)"><h2>איך לבחור, בשורה אחת</h2><ul><li>עובדים במשרד, מסמכים ומיילים: כל אחד מהגדולים מספיק. בחרו את האפליקציה שנוח לכם, וודאו שהיא תומכת בסקילים.</li><li>משימות ארוכות או קוד: מודל חזק (Claude Opus, GPT-6, Gemini 4) שווה את זה.</li><li>הרבה בקשות קטנות או תקציב נמוך: מודל מהיר וזול עם סקיל טוב.</li></ul></section></div>';
+      '<span class="note">מקורות: ' + f.src.map(function (x) { return '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>'; }).join(' · ') + '. התיאורים מבוססים בעיקר על מה שהחברות עצמן כותבות.</span></section>' +
+      '<section class="less"><h2>ואיך זה קשור לסקילים?</h2><div class="cols">' +
+      '<div><strong>האפליקציה טוענת, המודל קורא</strong><span style="font-size:17px">סקיל הוא הוראות כתובות. האפליקציה (Claude, ChatGPT, Cursor) טוענת אותו, והמודל קורא ומבצע. לכן קודם בודקים שהאפליקציה תומכת בסקילים.</span></div>' +
+      '<div><strong>סקיל טוב שווה הרבה</strong><span style="font-size:17px">במבחן SkillsBench, סקילים העלו את ההצלחה בכ־14.5 נקודות בממוצע. במחקר, מודל קטן עם סקילים עקף מודל גדול בלי סקילים.</span></div>' +
+      '<div style="background:var(--pink)"><strong>אבל לא קסם</strong><span style="font-size:17px">בחלק מהמשימות סקילים הזיקו. 2–3 סקילים קצרים וממוקדים עובדים טוב יותר מהרבה סקילים ארוכים.</span></div></div>' +
+      '<p class="note" style="color:#ddd">מקורות: <a style="color:var(--yellow)" href="https://vals.ai/benchmarks/skillsbench" target="_blank" rel="noopener">Vals AI, SkillsBench</a> (עודכן 27.09.2026) · <a style="color:var(--yellow)" href="https://arxiv.org/html/2602.12670v1" target="_blank" rel="noopener">המאמר של SkillsBench</a> · <a style="color:var(--yellow)" href="https://evaluatingevals.substack.com/p/skillsbench-review" target="_blank" rel="noopener">ביקורת עצמאית על המבחן</a></p></section></div>';
   }
 
   /* ---------- updates & legal ---------- */
@@ -450,6 +490,7 @@
     else if (act === 'try') { st.q = v; st.need = 'all'; st.shown = 24; $('#q').value = v; refreshCatalog(); document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' }); }
     else if (act === 'clear') { st.q = ''; st.need = 'all'; var q = $('#q'); if (q) q.value = ''; refreshCatalog(); }
     else if (act === 'install') { st.install = !st.install; rerender(); if (st.install) { var ib = $('#installbox'); if (ib) ib.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }
+    else if (act === 'mfam') { st.mfam = v; rerender(); }
     else if (act === 'adv') { st.adv = !st.adv; rerender(); }
     else if (act === 'copy') { try { navigator.clipboard.writeText(v); } catch (x) {} b.textContent = 'הועתק'; }
     else if (act === 'tool') { st.tool = v; st.bq = $('#bq').value; rerender(); }
