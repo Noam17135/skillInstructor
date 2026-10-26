@@ -166,8 +166,7 @@
     if (!s) return notFound();
     var trust = [
       s.official ? ['פורסם על ידי ' + s.by + ', מפרסם רשמי', '#9BE38A', 'M5 12l5 5 9-10'] : ['פורסם על ידי ' + s.by + ', יוצר עצמאי', '#FFE08A', 'M12 7v6M12 17h.01'],
-      [s.evidence + ': ' + s.evDetail, s.evidence === 'ממפרסם רשמי' ? '#FFE08A' : '#9BE38A', s.evidence === 'ממפרסם רשמי' ? 'M12 7v6M12 17h.01' : 'M5 12l5 5 9-10'],
-      ['סריקת אבטחה חיצונית: לא נמצאה עדיין', '#FFFFFF', 'M7 12h10']
+      [s.evidence + ': ' + s.evDetail, s.evidence === 'ממפרסם רשמי' ? '#FFE08A' : '#9BE38A', s.evidence === 'ממפרסם רשמי' ? 'M12 7v6M12 17h.01' : 'M5 12l5 5 9-10']
     ];
     var overlaps = s.ov ? (byOv[s.ov] || []).filter(function (o) { return o.id !== s.id; }) : [];
     var pairs = (s.pairs || []).map(function (k) { return byKey[k]; }).filter(Boolean);
@@ -209,7 +208,7 @@
         return '<span>' + esc(d[0]) + '</span><span dir="auto" class="' + d[2] + '" style="overflow-wrap:anywhere">' + esc(d[1]) + '</span>'; }).join('') + '</div>' : '') + '</section>' +
       '</div><aside>' +
       '<section class="box sm shadow"><h2>עובד עם</h2>' + (s.works && s.works.length ? '<div class="works">' + s.works.map(function (w) { return '<span>' + esc(w) + '</span>'; }).join('') + '</div><span class="note">לפי מה שכתוב בתיעוד של הסקיל.</span>' : '<span class="note">עוד לא בדקנו בתיעוד של הסקיל עם אילו כלים הוא עובד.</span>') +
-      '<div style="padding-top:12px;border-top:2px dashed var(--ink);display:flex;flex-direction:column;gap:4px"><strong style="font-size:16px">עם איזה מודל זה עובד הכי טוב?</strong><span class="note">לא נמצאו מבחנים ציבוריים שהשוו את הסקיל הזה בין מודלים.</span></div></section>' +
+      '</section>' +
       '<section class="box sm"><h2>האם זה בטוח</h2>' + trust.map(function (t) {
         return '<div class="trust"><span class="dot" style="background:' + t[1] + '">' + mark(t[2]) + '</span><span>' + esc(t[0]) + '</span></div>'; }).join('') + '</section>' +
       '<section class="box sm" style="background:var(--cream);padding:20px 24px"><strong style="font-size:17px">מצאת בעיה בסקיל? אתה היוצר?</strong><a class="btn" style="align-self:flex-start;min-height:46px" href="#/legal/report">לדיווח או לבקשת עדכון</a></section>' +
