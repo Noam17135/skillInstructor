@@ -84,10 +84,7 @@
         return st.need === 'all' || s.need === st.need;
       });
     }
-    return S.filter(function (s) {
-      if (st.need !== 'all' && s.need !== st.need) return false;
-      return st.level === 'all' || s.level === st.level;
-    });
+    return S.filter(function (s) { return st.need === 'all' || s.need === st.need; });
   }
   var SITE = 'https://noam17135.github.io/skillInstructor/';
   function askAI(text, tool) {
@@ -130,12 +127,8 @@
   function catalogBody() {
     var list = filtered();
     var q = st.q.trim();
-    var heading = q ? 'תוצאות עבור ״' + q + '״' : st.need !== 'all' ? 'סקילים ל' + C[st.need].label : st.level === 'everyday' ? 'סקילים לשימוש יומיומי' : st.level === 'pro' ? 'סקילים למתקדמים' : 'כל הסקילים';
-    var levels = [['everyday', 'לשימוש יומיומי'], ['pro', 'למתקדמים'], ['all', 'הכול']];
+    var heading = q ? 'תוצאות עבור ״' + q + '״' : st.need !== 'all' ? 'סקילים ל' + C[st.need].label : 'כל הסקילים';
     return '<div class="sec-head"><h2>' + esc(heading) + '</h2><span style="font-size:16px;font-weight:700" aria-live="polite">' + list.length + ' סקילים</span></div>' +
-      (q ? '' : '<div class="levels" role="group" aria-label="רמה">' + levels.map(function (l) {
-        return '<button type="button" data-act="level" data-v="' + l[0] + '" aria-pressed="' + (st.level === l[0]) + '">' + l[1] + '</button>';
-      }).join('') + '</div>') +
       '<div class="row-chips" role="group" aria-label="סינון לפי צורך">' + chips(NEEDS, 'need', st.need) + '</div>' +
       (list.length ? '<div class="grid">' + list.slice(0, st.shown).map(card).join('') + '</div>' +
         (list.length > st.shown ? '<button type="button" class="btn shadow more" data-act="more">להציג עוד (' + (list.length - st.shown) + ')</button>' : '')
@@ -453,10 +446,9 @@
     var b = e.target.closest('[data-act]'); if (!b) return;
     var v = b.getAttribute('data-v'), act = b.getAttribute('data-act');
     if (act === 'need') { st.need = v; st.shown = 24; refreshCatalog(); }
-    else if (act === 'level') { st.level = v; st.shown = 24; refreshCatalog(); }
     else if (act === 'more') { st.shown += 48; refreshCatalog(); }
     else if (act === 'try') { st.q = v; st.need = 'all'; st.shown = 24; $('#q').value = v; refreshCatalog(); document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' }); }
-    else if (act === 'clear') { st.q = ''; st.need = 'all'; st.level = 'everyday'; var q = $('#q'); if (q) q.value = ''; refreshCatalog(); }
+    else if (act === 'clear') { st.q = ''; st.need = 'all'; var q = $('#q'); if (q) q.value = ''; refreshCatalog(); }
     else if (act === 'install') { st.install = !st.install; rerender(); if (st.install) { var ib = $('#installbox'); if (ib) ib.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }
     else if (act === 'adv') { st.adv = !st.adv; rerender(); }
     else if (act === 'copy') { try { navigator.clipboard.writeText(v); } catch (x) {} b.textContent = 'הועתק'; }
@@ -485,13 +477,14 @@
   });
   $('#skip').addEventListener('click', function (e) { e.preventDefault(); $('#main').focus(); });
 
-  fetch('data/skills.json').then(function (r) { return r.json(); }).then(function (d) {
+  fetch('data/skills.json?v=' + (window.SF_V || '')).then(function (r) { return r.json(); }).then(function (d) {
     S = d.skills;
     S.forEach(function (s) {
       byId[s.id] = s; if (s.key) byKey[s.key] = s;
       if (s.ov) (byOv[s.ov] = byOv[s.ov] || []).push(s);
       s._text = [s.title, s.what, s.ask, s.name, s.repo, s.job, s.desc, C[s.need] && C[s.need].label].join(' ').toLowerCase().replace(/[״"׳']/g, '');
     });
+    S.sort(function (a, b) { return (a.level === 'everyday' ? 0 : 1) - (b.level === 'everyday' ? 0 : 1); });
     engine = new window.SFMatch.Engine(S);
     route();
   }).catch(function () { $('#main').innerHTML = '<div class="wrap page"><p class="box">לא הצלחנו לטעון את הקטלוג. נסו לרענן.</p></div>'; });
