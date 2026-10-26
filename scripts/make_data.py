@@ -120,13 +120,14 @@ def num(v):
     if not m: return 0
     x = float(m.group(1).replace(',', ''))
     return int(x * (1000 if m.group(2) in 'Kk' and m.group(2) else 1_000_000 if m.group(2) in 'Mm' and m.group(2) else 1))
+STUDENT_DROP = {('dylantmoore/stata-skill', 'stata')}  # below the quality bar; Stata is covered by stata-regression
 if os.path.exists(f'{B}/students_raw.json') and os.path.exists(f'{B}/students_he.json'):
     raw = json.load(open(f'{B}/students_raw.json'))
     he = {(x['repo'].lower(), x['name']): x for x in json.load(open(f'{B}/students_he.json'))}
     existing = {(s['repo'].lower(), s['name']): s for s in skills}
     for r in raw:
         k = (r['repo'].lower(), r['name']); h = he.get(k)
-        if not h: continue
+        if not h or k in STUDENT_DROP: continue
         if k in existing:
             existing[k].setdefault('fields', []).append(r['field']); continue
         ins, stars = num(r.get('installs')), num(r.get('stars'))
