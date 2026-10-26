@@ -444,7 +444,7 @@
           (m.lim && m.lim.length ? '<p class="mdl-lim"><strong>שימו לב:</strong> ' + m.lim.map(esc).join(' ') + '</p>' : '') +
           '<p class="mdl-meta">מהירות: ' + SPD[m.speed] + ' · מחיר: ' + LVL[m.cost] + '</p></div></details>';
       }).join('') + '</div>' +
-      '<p class="note">מקורות: ' + f.src.map(function (x) { return '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>'; }).join(' · ') + '. התיאורים מבוססים בעיקר על מה שהחברות עצמן כותבות.</p></section>' +
+      '</section>' +
       '<section class="less"><h2>ואיך זה קשור לסקילים?</h2><div class="cols">' +
       '<div><strong>האפליקציה טוענת, המודל קורא</strong><span style="font-size:17px">סקיל הוא הוראות כתובות. האפליקציה (Claude, ChatGPT, Cursor) טוענת אותו, והמודל קורא ומבצע. לכן קודם בודקים שהאפליקציה תומכת בסקילים.</span></div>' +
       '<div><strong>סקיל טוב שווה הרבה</strong><span style="font-size:17px">במבחן SkillsBench, סקילים העלו את ההצלחה בכ־14.5 נקודות בממוצע. במחקר, מודל קטן עם סקילים עקף מודל גדול בלי סקילים.</span></div>' +
