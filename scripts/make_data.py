@@ -145,6 +145,55 @@ if os.path.exists(f'{B}/students_raw.json') and os.path.exists(f'{B}/students_he
         st['id'] = base if used[base] == 1 else f"{slugify(r['repo'].split('/')[0])}-{base}"
         skills.append(st)
 
+
+# ---- web & GitHub additions (no skills.sh): gh_out_*.json (+new_skills.json) and web_*_he.json ----
+OFFICIAL_OWNERS = {'anthropics', 'openai', 'google', 'google-labs-code', 'googleworkspace', 'microsoft', 'vercel', 'vercel-labs', 'nvidia', 'expo',
+    'firebase', 'stripe', 'cloudflare', 'supabase', 'github', 'huggingface', 'makenotion', 'figma', 'canva', 'shopify', 'hubspot', 'atlassian',
+    'slackapi', 'linear', 'remotion-dev', 'elevenlabs', 'mathworks', 'matlab', 'posit-dev', 'convex-dev', 'clerk', 'getsentry', 'neondatabase',
+    'prisma', 'flutter', 'aws', 'awslabs', 'azure', 'mongodb', 'redis', 'docker', 'hashicorp', 'grafana', 'datadog', 'adobe', 'zapier', 'dropbox',
+    'box', 'asana', 'salesforce', 'intercom', 'kepano', 'browser-use', 'firecrawl', 'greensock', 'better-auth', 'tldraw', 'shadcn-ui'}
+def add_external(items, src_label):
+    existing = {(s['repo'].lower(), s['name'].lower()) for s in skills}
+    n = 0
+    for it in items:
+        k = (it['repo'].lower(), it['name'].lower())
+        if k in existing or not it.get('title'):
+            continue
+        owner = it['repo'].split('/')[0].lower()
+        official = bool(it.get('official')) or owner in OFFICIAL_OWNERS
+        st = dict(name=it['name'], repo=it['repo'], url=it.get('url') or f"https://github.com/{it['repo']}", need=it.get('need') if it.get('need') in NEED_IDS else 'dev',
+                  official=official, installs=0, by=(it.get('publisher') or it['repo'].split('/')[0]).split('(')[0].strip(),
+                  title=it['title'], what=it['what'].rstrip('.') + '.', ask=strip_q(it.get('ask')), level=it.get('level', 'pro'),
+                  job=it.get('job', ''), syn=it.get('syn', []), desc=it.get('desc', ''), steps='code', layers=[src_label],
+                  cmd=it.get('install') or f"npx skills add {it['repo']} --skill {it['name']}")
+        if it.get('needs'): st['needs'] = it['needs']
+        if it.get('nots'): st['nots'] = it['nots']
+        envs = [e for e in (it.get('envs') or []) if isinstance(e, str) and len(e) < 40]
+        if envs: st['works'] = envs
+        if it.get('note'): st['note'] = it['note']
+        stars = it.get('stars') or 0
+        st['evidence'], st['evShort'], st['evDetail'] = evidence(dict(installs=0, stars=stars, official=official))
+        base = slugify(it['name']); used[base] += 1
+        st['id'] = base if used[base] == 1 else f"{slugify(it['repo'].split('/')[0])}-{base}"
+        skills.append(st); existing.add(k); n += 1
+    return n
+NEED_IDS = {'docs', 'data', 'slides', 'office', 'writing', 'business', 'marketing', 'design', 'dev', 'security', 'tokens', 'study'}
+gh_items = []
+if os.path.exists(f'{B}/new_skills.json'):
+    base_list = json.load(open(f'{B}/new_skills.json'))
+    for f in sorted(os.listdir(B)):
+        if re.match(r'gh_out_\d+\.json$', f):
+            for o in json.load(open(f'{B}/{f}')):
+                if o.get('keep') and o['i'] < len(base_list):
+                    b = base_list[o['i']]
+                    gh_items.append(dict(b, **{k: v for k, v in o.items() if k not in ('i', 'keep', 'reason')},
+                                         url=f"https://github.com/{b['repo']}/tree/HEAD/{b['path']}" if b.get('path') and b['path'] != '.' else f"https://github.com/{b['repo']}"))
+web_items = []
+for f in sorted(os.listdir(B)):
+    if re.match(r'web_\w+_he\.json$', f):
+        web_items += [x for x in json.load(open(f'{B}/{f}')) if x.get('keep', True)]
+print('added web', add_external(web_items, 'מחקר ברשת'), 'added github', add_external(gh_items, 'GitHub'))
+
 # overlap groups: hand-made groups override, otherwise identical job text
 ov = {}
 for gname, members in OVERRIDES.get('groups', {}).items():
@@ -178,7 +227,7 @@ for s in skills:
         s['syn'] = SYN[s['id']]
 
 # order: curated/everyday first, then by installs
-LO = ['יומיומי ותחומים חסרים', 'ברמה גבוהה (craft)', 'סטודנטים', 'אבטחה', 'שימוש נכון בטוקנים', 'פופולרי (טופ 250)']
+LO = ['יומיומי ותחומים חסרים', 'ברמה גבוהה (craft)', 'סטודנטים', 'מחקר ברשת', 'אבטחה', 'שימוש נכון בטוקנים', 'פופולרי (טופ 250)', 'GitHub']
 skills.sort(key=lambda x: (0 if x.get('rich') else 1, min(LO.index(l) for l in x['layers']), -(x['installs'] or 0)))
 for s in skills:
     s.pop('layers', None)

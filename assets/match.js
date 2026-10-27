@@ -158,7 +158,12 @@
   };
 
   var NICHE = ['lark', 'feishu', 'azure', 'aws', 'gcp', 'google cloud', 'gke', 'vercel', 'supabase', 'prisma', 'expo', 'remotion', 'hyperframes',
-    'opencode', 'clawdbot', 'openclaw', 'caveman', 'agentshield', 'kubernetes', 'k8s', 'django', 'spring', 'golang', 'solidity', 'electron', 'higgsfield', 'stitch', 'octopus', 'tenable'];
+    'opencode', 'clawdbot', 'openclaw', 'caveman', 'agentshield', 'kubernetes', 'k8s', 'django', 'spring', 'golang', 'solidity', 'electron', 'higgsfield', 'stitch', 'octopus', 'tenable',
+    'figma', 'canva', 'classroom', 'jira', 'confluence', 'planner', 'notion', 'airtable', 'monday', 'hubspot', 'salesforce', 'quickbooks', 'intercom', 'dropbox', 'slack',
+    'teams', 'sharepoint', 'outlook', 'adobe', 'indesign', 'elevenlabs', 'unity', 'n8n', 'shopify', 'amazon', 'netsuite', 'pendo', 'wingspan', 'airwallex', 'activecampaign', 'obsidian', 'binance', 'remotion', 'capcut'];
+  var ALIAS = { 'פיגמה': 'figma', 'קנבה': 'canva', 'גירה': 'jira', 'נושן': 'notion', 'אאוטלוק': 'outlook', 'סלאק': 'slack', 'טימס': 'teams', 'שופיפיי': 'shopify', 'אמזון': 'amazon',
+    'הבספוט': 'hubspot', 'אובסידיאן': 'obsidian', 'מאנדיי': 'monday', 'אדובי': 'adobe', 'קלאסרום': 'classroom', 'דרופבוקס': 'dropbox', 'שרפוינט': 'sharepoint', 'יוניטי': 'unity' };
+  function withAliases(q) { var out = q; for (var k in ALIAS) if (q.indexOf(k) !== -1) out += ' ' + ALIAS[k]; return out; }
   function prior(s, ctx) {
     var m = 1;
     var hay = (s.title + ' ' + s.name + ' ' + s.repo).toLowerCase();
@@ -180,7 +185,7 @@
     opts = opts || {};
     var toks = this.analyse(q);
     if (!toks.length) return [];
-    var ctx = { dev: DEV_HINT.test(clean(q)), tool: opts.tool, q: clean(q) };
+    var ctx = { dev: DEV_HINT.test(clean(q)), tool: opts.tool, q: withAliases(clean(q)) };
     var nq = words(q).join(' '), self = this;
     var res = this.score(toks, nq).map(function (r) {
       var cover = r.words.length / toks.length;
@@ -196,7 +201,7 @@
   Engine.prototype.cover = function (q, opts) {
     opts = opts || {};
     var self = this, toks = this.analyse(q), nq = words(q).join(' ');
-    var ctx = { dev: DEV_HINT.test(clean(q)), tool: opts.tool, q: clean(q) };
+    var ctx = { dev: DEV_HINT.test(clean(q)), tool: opts.tool, q: withAliases(clean(q)) };
     var remaining = toks.slice(), picks = [], skipped = [], usedOv = {}, usedIdx = {};
     var minScore = 3.2;
     for (var round = 0; round < 6 && remaining.length; round++) {

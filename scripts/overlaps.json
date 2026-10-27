@@ -1,6 +1,29 @@
 {
-  "groups": {
-    "design-taste": ["Taste Skill", "Impeccable", "Hallmark", "frontend-design", "design-taste-frontend", "gpt-taste", "design-taste-frontend-v1", "ui-taste"]
-  },
-  "drop_jobs": ["caveman llm cost", "browser fingerprinting", "framework security practices", "kubernetes hardening", "prisma upgrade", "architecture diagrams", "skill discovery", "secrets management", "cloud security posture", "fuzz testing", "azure app deployment", "prisma postgres setup"]
+ "groups": {
+  "design-taste": [
+   "Taste Skill",
+   "Impeccable",
+   "Hallmark",
+   "frontend-design",
+   "design-taste-frontend",
+   "gpt-taste",
+   "design-taste-frontend-v1",
+   "ui-taste"
+  ]
+ },
+ "drop_jobs": [
+  "caveman llm cost",
+  "browser fingerprinting",
+  "framework security practices",
+  "kubernetes hardening",
+  "prisma upgrade",
+  "architecture diagrams",
+  "skill discovery",
+  "secrets management",
+  "cloud security posture",
+  "fuzz testing",
+  "azure app deployment",
+  "prisma postgres setup",
+  "create status report"
+ ]
 }
