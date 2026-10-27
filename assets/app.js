@@ -116,7 +116,7 @@
     return '<div class="box shadow" style="align-items:flex-start">' +
       '<strong style="font-family:var(--head);font-weight:400;font-size:28px">עוד אין לנו סקיל לזה.</strong>' +
       '<span style="font-size:18px">ספר לנו מה ניסית לעשות, ונחפש סקיל מתאים. ככה אנחנו יודעים מה להוסיף לקטלוג.</span>' +
-      '<form class="req" style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:640px">' +
+      '<form class="req" data-type="request" style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:640px"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">' +
       '<label class="field">מה ניסית לעשות?<textarea name="need" rows="3" placeholder="למשל: לסכם הקלטה של פגישה ולשלוח לצוות">' + esc(prefill || '') + '</textarea></label>' +
       '<label class="field">באיזה כלי AI אתה עובד? (רשות)<input name="tool" type="text" placeholder="למשל: Claude, ChatGPT, Cursor"></label>' +
       '<div style="display:flex;flex-wrap:wrap;gap:10px"><button type="submit" class="btn pink head">שליחה</button>' +
@@ -249,21 +249,42 @@
     var text = (st.bq || '').trim();
     if (!text || !engine) return '';
     var r = engine.cover(text, { tool: st.tool });
-    if (!r.picks.length) return '<section class="box in" style="font-size:18px">עוד לא הבנתי מה צריך. נסו לתאר משימות, למשל ״לבנות מצגות ללקוחות״ או ״לענות מהר למיילים״.</section>' + askAI(text, st.tool);
+    var P = window.SFPlan, pl = P ? P.plan(S, text, { tool: st.tool, engine: engine }) : { picks: [], parsed: { inputs: [], outputs: [] } };
+    var FL = P ? P.FLABEL : {}, taken = {}, items = [];
+    pl.picks.forEach(function (p) {
+      taken[p.s.id] = 1; if (p.s.ov) taken['ov:' + p.s.ov] = 1;
+      var lab = []; if (p.need.in) lab.push('לקרוא ' + FL[p.need.in]); if (p.need.out) lab.push('ליצור ' + FL[p.need.out]);
+      items.push({ s: p.s, label: lab.join(' ו'), reason: p.reason, warn: p.warn, alts: p.alts });
+    });
+    r.picks.forEach(function (p) {
+      if (taken[p.s.id] || (p.s.ov && taken['ov:' + p.s.ov])) return;
+      taken[p.s.id] = 1; if (p.s.ov) taken['ov:' + p.s.ov] = 1;
+      items.push({ s: p.s, label: p.words.join(', '), reason: '', warn: P ? P.warnings(p.s, st.tool) : [], alts: [] });
+    });
+    if (!items.length) return '<section class="box in" style="font-size:18px">עוד לא הבנתי מה צריך. נסו לתאר משימות, למשל ״לבנות מצגות ללקוחות״ או ״לענות מהר למיילים״.</section>' + askAI(text, st.tool);
     var h = '<section style="display:flex;flex-direction:column;gap:22px">';
-    h += '<div class="understood"><span>הבנתי שאתם צריכים:</span>' + r.picks.map(function (p) {
-      return '<span class="tag" style="background:' + C[p.s.need].color + '">' + esc(p.words.join(' · ')) + '</span>'; }).join('') + '</div>';
-    h += '<div class="sec-head"><h2>הסט שלכם: ' + (r.picks.length === 1 ? 'סקיל אחד' : r.picks.length + ' סקילים') + '</h2></div>';
-    h += '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:24px">' + r.picks.map(function (p, i) {
-      var s = p.s, f = fit(s, st.tool);
+    var pin = (pl.parsed.inputs.length ? pl.parsed.inputs : pl.parsed.neutral || []).filter(function (x, i, a) { return i === 0 || ['report', 'data', 'text'].indexOf(x) === -1; }), pout = pl.parsed.outputs;
+    var pu = pl.parsed.used || {}; r.leftover = r.leftover.filter(function (w) { return !pu[w]; });
+    if (pl.picks.length && (pin.length || pout.length)) h += '<div class="box" style="background:var(--cream);padding:18px 24px;gap:6px"><strong style="font-size:18px">המסלול שזיהינו</strong><span style="font-size:17px">' +
+      (pin.length ? 'מתחילים מ: <b>' + esc(pin.map(function (x) { return FL[x]; }).join(', ')) + '</b>' : '') + (pin.length && pout.length ? ' ← ' : '') +
+      (pout.length ? 'רוצים לקבל: <b>' + esc(pout.map(function (x) { return FL[x]; }).join(', ')) + '</b>' : '') +
+      (pl.tool ? ' · בכלי: <b>' + esc(pl.tool) + '</b>' : '') + '</span><span class="note">בחרנו לפי מה שכתוב בתיעוד של כל סקיל: מה הוא קורא, מה הוא מייצר ומה הוא צריך.</span></div>';
+    h += '<div class="understood"><span>הבנתי שאתם צריכים:</span>' + items.map(function (p) {
+      return '<span class="tag" style="background:' + C[p.s.need].color + '">' + esc(p.label) + '</span>'; }).join('') + '</div>';
+    h += '<div class="sec-head"><h2>הסט שלכם: ' + (items.length === 1 ? 'סקיל אחד' : items.length + ' סקילים') + '</h2></div>';
+    h += '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:24px">' + items.map(function (p, i) {
+      var s = p.s;
       return '<div class="card ' + TILTS[i % 4] + '" style="cursor:default;gap:12px;animation-delay:' + i * 0.06 + 's">' +
-        '<span class="tag" style="align-self:flex-start;background:' + C[s.need].color + '">בשביל: ' + esc(p.words.join(', ')) + '</span>' +
+        '<span class="tag" style="align-self:flex-start;background:' + C[s.need].color + '">בשביל: ' + esc(p.label) + '</span>' +
         '<span class="t">' + esc(s.title) + '</span><span class="w">' + esc(s.what) + '</span>' +
+        (p.reason ? '<span style="font-size:15px">' + esc(p.reason) + '</span>' : '') +
         '<span style="font-size:14px;font-weight:600;color:var(--muted)">' + esc(s.by) + ' · ' + esc(s.evShort) + '</span>' +
-        (st.tool && f < 1 ? '<span style="padding:8px 12px;background:#FFE08A;border:2px solid var(--ink);border-radius:12px;font-size:14px;font-weight:600">' +
-          (f === 0 ? 'לא מוזכר בתיעוד שעובד עם ' + esc(st.tool) + '.' : 'עוד לא בדקנו אם הוא עובד עם ' + esc(st.tool) + '.') + '</span>' : '') +
+        (p.warn.length ? '<div style="padding:8px 12px;background:#FFE08A;border:2px solid var(--ink);border-radius:12px;font-size:14px;font-weight:600;display:flex;flex-direction:column;gap:4px">' +
+          p.warn.map(function (w) { return '<span>' + esc(w) + '</span>'; }).join('') + '</div>' : '') +
+        (p.alts.length ? '<span style="font-size:14px">חלופות: ' + p.alts.map(function (o) { return '<a href="#/skill/' + esc(o.id) + '" style="font-weight:700">' + esc(o.title) + '</a>'; }).join(' · ') + '</span>' : '') +
         '<a class="btn yellow" style="align-self:flex-start;margin-top:auto;min-height:46px" href="#/skill/' + esc(s.id) + '">לעמוד הסקיל</a></div>';
     }).join('') + '</div>';
+    r.skipped = r.skipped.filter(function (k) { return !taken[k.s.id]; });
     if (r.skipped.length) h += '<div class="box" style="background:var(--cream);gap:10px;padding:22px 26px"><strong style="font-size:19px">גם אלה מתאימים, אבל לא הוספנו אותם</strong>' +
       '<span style="font-size:16px;color:var(--muted)">כל אחד מהם עושה כמעט אותו דבר כמו סקיל שכבר בסט. שני סקילים לאותה משימה רק מבלבלים את ה־AI.</span>' + r.skipped.map(function (k) {
       return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:16px"><a href="#/skill/' + esc(k.s.id) + '" style="font-weight:700">' + esc(k.s.title) + '</a><span>במקום ״' + esc(k.instead.title) + '״</span></div>';
@@ -481,7 +502,7 @@
       '<article id="privacy" class="box"><h2>מדיניות פרטיות</h2><ul style="font-size:17px"><li>אין באתר הרשמה, חשבונות או רשימת תפוצה.</li><li>האתר משתמש ב־Cloudflare Web Analytics כדי לספור כניסות לעמודים. הכלי לא משתמש בעוגיות, לא שומר מידע בדפדפן ולא עוקב אחרי גולשים בין אתרים. נשמרים רק נתונים מצטברים, כמו מספר כניסות, מדינה, סוג מכשיר ודפדפן.</li><li>בטופס הדיווח, כתובת המייל היא רשות, ומשמשת רק לחזרה אליך.</li><li>לשאלות על המידע שלך: [כתובת מייל ליצירת קשר].</li></ul></article>' +
       '<article id="a11y" class="box"><h2>הצהרת נגישות</h2><p style="font-size:17px;line-height:1.7">האתר נבנה לפי התקן הישראלי 5568, ברמת AA. אפשר לנווט בכל האתר עם המקלדת, הטקסט עומד ביחסי ניגודיות מומלצים, ומי שהגדיר במכשיר הפחתת תנועה יקבל את האתר בלי הנפשות.</p><p style="font-size:17px;line-height:1.7">נתקלת בבעיית נגישות? אפשר לפנות אל [שם רכז/ת הנגישות], בטלפון [מספר] או במייל [כתובת].</p><span class="note" style="font-weight:600">ההצהרה עודכנה: [תאריך הבדיקה האחרונה]</span></article>' +
       '<article id="report" class="box" style="background:var(--green)"><h2>דיווח או בקשת עדכון</h2><p style="font-size:17px">יש טעות במידע על סקיל? אתה היוצר ורוצה לעדכן או להסיר אותו? ספר לנו, ונבדוק.</p>' +
-      '<form class="req" style="display:flex;flex-direction:column;gap:14px"><label class="field">על איזה סקיל מדובר<input name="skill" type="text" placeholder="שם הסקיל או קישור"></label>' +
+      '<form class="req" data-type="report" style="display:flex;flex-direction:column;gap:14px"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><label class="field">על איזה סקיל מדובר<input name="skill" type="text" placeholder="שם הסקיל או קישור"></label>' +
       '<fieldset style="margin:0;padding:0;border:0;display:flex;flex-wrap:wrap;gap:10px"><legend style="padding:0;margin-bottom:8px;font-size:16px;font-weight:700">מה תרצה</legend>' +
       ['לתקן מידע', 'אני היוצר, רוצה להסיר', 'בעיית אבטחה'].map(function (k) {
         return '<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;background:#fff;border:2px solid var(--ink);border-radius:999px;font-size:16px;cursor:pointer"><input type="radio" name="kind" value="' + k + '" style="width:18px;height:18px;margin:0;accent-color:#141414">' + k + '</label>'; }).join('') + '</fieldset>' +
@@ -569,8 +590,27 @@
     e.preventDefault();
     if (e.target.id === 'searchform') { document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' }); return; }
     if (e.target.id === 'buildform') { st.bq = $('#bq').value; var r = $('#results'); r.innerHTML = buildResults(); r.scrollIntoView({ behavior: 'smooth' }); return; }
-    if (e.target.classList.contains('req')) { toast('תודה! זו גרסת בדיקה, ועוד אין חיבור לשליחה.'); }
+    if (e.target.classList.contains('req')) { sendForm(e.target); }
   });
+  /* Forms are sent to Formspree (free tier), which forwards them by email. Set the form id here. */
+  var FORM_ENDPOINT = window.SF_FORM || '';
+  function sendForm(form) {
+    var fd = new FormData(form);
+    if (fd.get('_gotcha')) return;                  // spam trap filled: silently ignore
+    var hasText = false; fd.forEach(function (v, k) { if (k !== '_gotcha' && String(v).trim()) hasText = true; });
+    if (!hasText) { toast('נא למלא לפחות שדה אחד.'); return; }
+    fd.append('page', location.hash || '#/');
+    fd.append('type', form.getAttribute('data-type') || 'request');
+    if (!FORM_ENDPOINT) { toast('הטופס עוד לא מחובר לשליחה. נחבר אותו בקרוב.'); return; }
+    var btn = form.querySelector('[type=submit]'); if (btn) { btn.disabled = true; btn.textContent = 'שולח…'; }
+    fetch(FORM_ENDPOINT, { method: 'POST', body: fd, headers: { Accept: 'application/json' } })
+      .then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        form.reset(); toast('תודה! קיבלנו, ונחזור אם השארת מייל.');
+      })
+      .catch(function () { toast('השליחה לא הצליחה. נסו שוב בעוד רגע.'); })
+      .then(function () { if (btn) { btn.disabled = false; btn.textContent = 'שליחה'; } });
+  }
   function toast(t) {
     var d = document.createElement('div'); d.className = 'toast'; d.setAttribute('role', 'status'); d.textContent = t;
     document.body.appendChild(d); setTimeout(function () { d.remove(); }, 3200);

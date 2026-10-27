@@ -172,6 +172,7 @@ def add_external(items, src_label):
         if envs: st['works'] = envs
         if it.get('note'): st['note'] = it['note']
         stars = it.get('stars') or 0
+        if stars: st['stars'] = stars
         st['evidence'], st['evShort'], st['evDetail'] = evidence(dict(installs=0, stars=stars, official=official))
         base = slugify(it['name']); used[base] += 1
         st['id'] = base if used[base] == 1 else f"{slugify(it['repo'].split('/')[0])}-{base}"
@@ -207,6 +208,7 @@ for s in skills:
     m = META.get(s['repo'])
     if m and m.get('last_commit'):
         s['updated'] = m['last_commit'][:10]
+    if STARS.get(s['repo'].lower()): s['stars'] = STARS[s['repo'].lower()]
     if s['repo'] in NOT_OFFICIAL and s.get('official'):
         s['official'] = False
         s['evidence'], s['evShort'], s['evDetail'] = evidence(dict(installs=s.get('installs') or 0, stars=STARS.get(s['repo'].lower(), 0), official=False))
