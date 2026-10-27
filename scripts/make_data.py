@@ -258,6 +258,23 @@ for s in skills:
     if s['id'] in SYN:
         s['syn'] = SYN[s['id']]
 
+
+# ---- richer page content written from each skill's SKILL.md (ct_out_*.json) ----
+CT = {}
+for f in sorted(os.listdir(B)):
+    if re.match(r'ct_out_\d+\.json$', f):
+        for x in json.load(open(f'{B}/{f}')): CT[x['id']] = x
+for s in skills:
+    c = CT.get(s['id'])
+    if not c or s.get('rich'): continue
+    if c.get('why'): s['why'] = c['why']
+    if c.get('does'): s['does'] = c['does']
+    if c.get('how'): s['how'] = c['how']
+    if c.get('examples'): s['examples'] = [e for e in c['examples'] if e.get('ask')]
+    if c.get('needs') and (not s.get('needs') or 'לא מצוין' not in c['needs']): s['needs'] = c['needs']
+    if c.get('nots') and not s.get('nots'): s['nots'] = c['nots']
+    if c.get('works') and not s.get('works'): s['works'] = c['works']
+
 # order: curated/everyday first, then by installs
 LO = ['יומיומי ותחומים חסרים', 'ברמה גבוהה (craft)', 'סטודנטים', 'מחקר ברשת', 'אבטחה', 'שימוש נכון בטוקנים', 'פופולרי (טופ 250)', 'GitHub']
 skills.sort(key=lambda x: (0 if x.get('rich') else 1, min(LO.index(l) for l in x['layers']), -(x['installs'] or 0)))
@@ -265,7 +282,18 @@ for s in skills:
     s.pop('layers', None)
 
 os.makedirs(f'{B}/../repo/data', exist_ok=True)
-json.dump({'updated': '2026-10', 'skills': skills}, open(f'{B}/../repo/data/skills.json', 'w'), ensure_ascii=False, separators=(',', ':'))
+DETAIL = ['why', 'does', 'how', 'examples', 'nots', 'needs', 'best', 'tryAsk', 'good', 'bad', 'note', 'cmdNote', 'license', 'pairs', 'steps', 'desc']
+import shutil
+ddir = f'{B}/../repo/data/d'
+shutil.rmtree(ddir, ignore_errors=True); os.makedirs(ddir, exist_ok=True)
+index = []
+for x in skills:
+    det = {k: x[k] for k in DETAIL if k in x}
+    json.dump(det, open(f'{ddir}/{x["id"]}.json', 'w'), ensure_ascii=False, separators=(',', ':'))
+    lean = {k: v for k, v in x.items() if k not in DETAIL}
+    if x.get('desc'): lean['desc'] = x['desc'][:220]
+    index.append(lean)
+json.dump({'updated': '2026-10', 'skills': index}, open(f'{B}/../repo/data/skills.json', 'w'), ensure_ascii=False, separators=(',', ':'))
 print(len(skills), collections.Counter(s['need'] for s in skills), collections.Counter(s['level'] for s in skills))
 print('overlap groups', len({s['ov'] for s in skills if s.get('ov')}), 'skills in groups', sum(1 for s in skills if s.get('ov')))
 print('keys', sorted(s['key'] for s in skills if s.get('key')))

@@ -1,0 +1,1 @@
+{"steps":"code","desc":"Execute plan tasks sequentially using subagents. Use when user says 'exec', 'execute plan', 'run plan', or wants to implement a plan file task by task with isolated subagents."}

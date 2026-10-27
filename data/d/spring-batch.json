@@ -1,0 +1,1 @@
+{"steps":"code","desc":"Use when building batch jobs, ETL pipelines, scheduled imports/exports, or any chunk-oriented bulk processing with Spring Batch. Covers the Spring Batch 6 / Boot 4 builder API, resourceless vs JDBC job repositories, restartability and idempotent job parameters, reader/writer thread-safety, fault tolerance, and chunk transaction boundaries."}

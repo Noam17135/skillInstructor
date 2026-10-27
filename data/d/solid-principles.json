@@ -1,0 +1,1 @@
+{"steps":"code","desc":"SOLID principles checklist with Java examples. Use when a class has too many responsibilities, an abstraction leaks, or a dependency points the wrong way, and when the user asks about Single Responsibility, Open/Closed, Liskov, Interface Segregation or Dependency Inversion. For naming, duplication and method length, use clean-code instead."}

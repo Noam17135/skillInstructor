@@ -1,0 +1,1 @@
+{"steps":"code","desc":"Generate and publish concise, evidence-based notes in the body of the latest existing GitHub Release. Use only when the user explicitly invokes `$release-notes` or explicitly asks to update the latest existing GitHub Release body. Do not invoke for general release planning, changelog, tag, or version tasks."}

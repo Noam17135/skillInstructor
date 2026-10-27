@@ -209,3 +209,6 @@ details.mdl summary:hover{background:#FAFAFA}
 .alt-row:hover{transform:translateY(-2px)}
 .alt-row strong{font-size:16px}
 .alt-row span{font-size:15px;line-height:1.5;color:#3A3A3A}
+ul.ticks{list-style:none;padding:0!important}
+ul.ticks li{position:relative;padding-inline-start:30px}
+ul.ticks li::before{content:"✓";position:absolute;inset-inline-start:0;top:3px;width:20px;height:20px;border-radius:50%;background:#9BE38A;border:2px solid var(--ink);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}

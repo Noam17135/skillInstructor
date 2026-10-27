@@ -166,8 +166,8 @@
     if (!s) return notFound();
     var trust = [
       s.official ? ['פורסם על ידי ' + s.by + ', מפרסם רשמי', '#9BE38A', 'M5 12l5 5 9-10'] : ['פורסם על ידי ' + s.by + ', יוצר עצמאי', '#FFE08A', 'M12 7v6M12 17h.01'],
-      [s.evidence + ': ' + s.evDetail, s.evidence === 'ממפרסם רשמי' ? '#FFE08A' : '#9BE38A', s.evidence === 'ממפרסם רשמי' ? 'M12 7v6M12 17h.01' : 'M5 12l5 5 9-10']
-    ];
+      s.evidence === 'ממפרסם רשמי' ? null : [s.evidence + ': ' + s.evDetail, '#9BE38A', 'M5 12l5 5 9-10']
+    ].filter(Boolean);
     if (s.updated) {
       var days = Math.floor((Date.now() - new Date(s.updated + 'T00:00:00').getTime()) / 864e5);
       var d = s.updated.split('-'); var shown = d[2] + '.' + d[1] + '.' + d[0];
@@ -191,10 +191,11 @@
       '<section class="skill-hero in"><div class="main">' +
       '<span class="tag" style="align-self:flex-start;background:' + C[s.need].color + '">' + esc(C[s.need].label) + '</span>' +
       '<h1>' + esc(s.title) + '</h1><p style="font-size:21px;line-height:1.5;font-weight:500;max-width:700px">' + esc(s.what) + '</p>' +
+      (s.why ? '<p style="font-size:18px;line-height:1.6;max-width:720px;color:#2A2A2A"><strong>למה זה עוזר: </strong>' + esc(s.why) + '</p>' : '') +
       (s.best && s.best.length ? '<div class="row-chips"><span style="font-weight:700">מתאים במיוחד ל:</span>' + s.best.map(function (b) {
         return '<span class="tag" style="background:var(--cream);font-weight:600">' + esc(b) + '</span>'; }).join('') + '</div>' : '') +
       '<div class="row-chips" style="font-weight:400"><span>מאת <strong>' + esc(s.by) + '</strong></span>' +
-      (s.official ? '<span class="dark-tag">מפרסם רשמי</span>' : '') + '<span class="tag">' + esc(s.evidence) + '</span></div></div>' +
+      (s.official ? '<span class="dark-tag">מפרסם רשמי</span>' : '') + (s.evidence !== 'ממפרסם רשמי' ? '<span class="tag">' + esc(s.evidence) + '</span>' : '') + '</div></div>' +
       '<button type="button" class="btn pink big install" data-act="install" aria-expanded="' + st.install + '" aria-controls="installbox">להתקנה</button></section>' +
       (st.install ? installBox(s) : '') +
       '<div class="cols2"><div class="main">' +
@@ -202,6 +203,9 @@
         return '<div class="conv"><span class="bub-me" style="animation-delay:' + (0.15 + i * 0.4) + 's">״' + esc(e.ask) + '״</span>' +
           (e.get ? '<span class="bub-ai" style="animation-delay:' + (0.4 + i * 0.4) + 's">' + esc(e.get) + '</span>' : '') + '</div>';
       }).join('') + '</section>' : '') +
+      (s.does && s.does.length ? '<section class="box"><h2>מה הוא עושה בפועל</h2><ul class="ticks">' + s.does.map(function (d) { return '<li>' + esc(d) + '</li>'; }).join('') + '</ul></section>' : '') +
+      (s.how && s.how.length ? '<section class="box" style="background:var(--cream)"><h2>איך עובדים איתו</h2><ol class="st">' + s.how.map(function (t, i) {
+        return '<li><span class="num" style="background:var(--yellow)">' + (i + 1) + '</span><span>' + esc(t) + '</span></li>'; }).join('') + '</ol></section>' : '') +
       '<section class="box" style="background:var(--green)"><h2>איך מתקינים</h2><ol class="st">' + steps.map(function (t, i) {
         return '<li><span class="num">' + (i + 1) + '</span><span>' + esc(t) + '</span></li>'; }).join('') + '</ol></section>' +
       (s.tryAsk ? '<section class="box" style="background:var(--blue)"><div><h2>נסו את זה</h2><span style="font-size:17px">אחרי ההתקנה, בקשו את זה ותבדקו את התוצאה. זה לוקח כמה דקות.</span></div>' +
@@ -495,7 +499,15 @@
     var parts = path.split('/').filter(Boolean);
     var html, title = 'SkillFit · מדריך פשוט לסקילים של AI', active = '/';
     if (!parts.length) html = home();
-    else if (parts[0] === 'skill') { var s = byId[decodeURIComponent(parts[1] || '')]; html = skillPage(s); if (s) title = s.title + ' · SkillFit'; }
+    else if (parts[0] === 'skill') {
+      var s = byId[decodeURIComponent(parts[1] || '')];
+      if (s && !s._loaded) {
+        html = '<div class="wrap page"><p class="note" style="font-size:17px">טוען…</p></div>';
+        fetch('data/d/' + encodeURIComponent(s.id) + '.json?v=' + (window.SF_V || '')).then(function (r) { return r.ok ? r.json() : {}; }, function () { return {}; })
+          .then(function (d) { Object.assign(s, d); s._loaded = true; if ((location.hash || '').indexOf('#/skill/' + s.id) === 0) route(true); });
+      } else html = skillPage(s);
+      if (s) title = s.title + ' · SkillFit';
+    }
     else if (parts[0] === 'build') { html = build(); active = '/build'; title = 'בנו לי סט · SkillFit'; }
     else if (parts[0] === 'guides') { html = guides(); active = '/guides'; title = 'מדריכים · SkillFit'; }
     else if (parts[0] === 'guide') { html = guide(parts[1]); active = '/guides'; title = 'מדריך · SkillFit'; }
