@@ -168,7 +168,14 @@
       s.official ? ['פורסם על ידי ' + s.by + ', מפרסם רשמי', '#9BE38A', 'M5 12l5 5 9-10'] : ['פורסם על ידי ' + s.by + ', יוצר עצמאי', '#FFE08A', 'M12 7v6M12 17h.01'],
       [s.evidence + ': ' + s.evDetail, s.evidence === 'ממפרסם רשמי' ? '#FFE08A' : '#9BE38A', s.evidence === 'ממפרסם רשמי' ? 'M12 7v6M12 17h.01' : 'M5 12l5 5 9-10']
     ];
-    var overlaps = s.ov ? (byOv[s.ov] || []).filter(function (o) { return o.id !== s.id; }) : [];
+    if (s.updated) {
+      var days = Math.floor((Date.now() - new Date(s.updated + 'T00:00:00').getTime()) / 864e5);
+      var d = s.updated.split('-'); var shown = d[2] + '.' + d[1] + '.' + d[0];
+      trust.push(days > 180 ? ['לא עודכן יותר מחצי שנה. עדכון אחרון בריפו: ' + shown, '#FFB86B', 'M12 7v6M12 17h.01']
+        : ['עדכון אחרון בריפו: ' + shown, '#9BE38A', 'M5 12l5 5 9-10']);
+    }
+    var overlaps = s.ov ? (byOv[s.ov] || []).filter(function (o) { return o.id !== s.id && o.altStatus !== 'dup'; })
+      .sort(function (a, b) { return (a.altRank || 99) - (b.altRank || 99) || (b.installs || 0) - (a.installs || 0); }).slice(0, 4) : [];
     var pairs = (s.pairs || []).map(function (k) { return byKey[k]; }).filter(Boolean);
     var details = [
       ['שם טכני', s.name, 'mono'], ['מקור', s.repo, 'mono'], ['רישיון', s.license || 'לפי הריפו', ''],
@@ -213,8 +220,9 @@
         return '<div class="trust"><span class="dot" style="background:' + t[1] + '">' + mark(t[2]) + '</span><span>' + esc(t[0]) + '</span></div>'; }).join('') + '</section>' +
       '<section class="box sm" style="background:var(--cream);padding:20px 24px"><strong style="font-size:17px">מצאת בעיה בסקיל? אתה היוצר?</strong><a class="btn" style="align-self:flex-start;min-height:46px" href="#/legal/report">לדיווח או לבקשת עדכון</a></section>' +
       '<section class="box sm" style="background:var(--purple)"><h2>מה צריך כדי שיעבוד</h2><span style="font-size:16px">' + esc(s.needs || 'עוד לא בדקנו. הפרטים נמצאים במקור של הסקיל.') + '</span></section>' +
-      (overlaps.length ? '<section class="box sm" style="background:var(--red)"><h2>חופף ל</h2><span style="font-size:16px">הסקילים האלה עושים כמעט אותו דבר. מספיק להתקין אחד מהם.</span>' +
-        overlaps.slice(0, 5).map(function (o) { return '<a class="link-row" style="background:#fff" href="#/skill/' + esc(o.id) + '"><span>' + esc(o.title) + '</span>' + ICON.fwd + '</a>'; }).join('') + '</section>' : '') +
+      (overlaps.length ? '<section class="box sm" style="background:#FFF6D1"><h2>חלופות</h2><span style="font-size:16px">הסקילים האלה עושים משימה דומה. בחרו אחד, לפי מה שמתאים לכם.</span>' +
+        (s.choose ? '<div class="alt-row" style="background:#fff;border-style:dashed"><strong style="font-size:15px">הסקיל הזה</strong><span>' + esc(s.choose) + '</span></div>' : '') +
+        overlaps.map(function (o) { return '<a class="alt-row" href="#/skill/' + esc(o.id) + '"><strong>' + esc(o.title) + '</strong>' + (o.choose ? '<span>' + esc(o.choose) + '</span>' : '<span>' + esc(o.what) + '</span>') + '</a>'; }).join('') + '</section>' : '') +
       (pairs.length ? '<section class="box sm"><h2>משתלב טוב עם</h2>' + pairs.map(function (o) {
         return '<a class="link-row" href="#/skill/' + esc(o.id) + '"><span>' + esc(o.title) + '</span>' + ICON.fwd + '</a>'; }).join('') + '</section>' : '') +
       '</aside></div></div>';

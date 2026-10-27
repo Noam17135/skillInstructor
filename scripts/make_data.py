@@ -99,7 +99,7 @@ for i, r in enumerate(R):
     # rich hand-written content
     rk = RICH.get(RICH_REPO.get(r['repo'], '')) if craft else RICH.get(r['name'])
     if rk:
-        s.update(key=rk['id'], rich=True, title=rk['title'], what=rk['what'], ask=rk['ask'], examples=rk['examples'],
+        s.update(key=rk['id'], rich=True, by=rk['by'], title=rk['title'], what=rk['what'], ask=rk['ask'], examples=rk['examples'],
                  works=rk['works'], needs=rk['needs'], nots=rk['nots'], best=rk['best'], tryAsk=rk['tryAsk'],
                  good=rk['good'], bad=rk['bad'], cmd=rk['cmd'], license=rk['license'], pairs=rk['pairs'],
                  steps='app' if rk['steps'] and 'ומורידים' in rk['steps'][0] else 'code', level='everyday',
@@ -194,6 +194,23 @@ for f in sorted(os.listdir(B)):
         web_items += [x for x in json.load(open(f'{B}/{f}')) if x.get('keep', True)]
 print('added web', add_external(web_items, 'מחקר ברשת'), 'added github', add_external(gh_items, 'GitHub'))
 
+
+# ---- verified repo facts: last commit date, and "official" only when the repo doesn't disclaim it ----
+import csv, glob
+META = json.load(open(f'{B}/repo_meta.json')) if os.path.exists(f'{B}/repo_meta.json') else {}
+NOT_OFFICIAL = {k for k, v in META.items() if v.get('disclaimer')} | {'kepano/obsidian-skills', 'github/awesome-copilot'}
+STARS = {}
+_gr = sorted(glob.glob('/home/claude/gap/bs/data/2026-*/raw/github-repos.csv'))
+if _gr:
+    for r in csv.DictReader(open(_gr[-1])): STARS[r['repo'].lower()] = int(r['stars'] or 0)
+for s in skills:
+    m = META.get(s['repo'])
+    if m and m.get('last_commit'):
+        s['updated'] = m['last_commit'][:10]
+    if s['repo'] in NOT_OFFICIAL and s.get('official'):
+        s['official'] = False
+        s['evidence'], s['evShort'], s['evDetail'] = evidence(dict(installs=s.get('installs') or 0, stars=STARS.get(s['repo'].lower(), 0), official=False))
+
 # overlap groups: hand-made groups override, otherwise identical job text
 ov = {}
 for gname, members in OVERRIDES.get('groups', {}).items():
@@ -210,6 +227,21 @@ for job, ms in by_job.items():
     if len(ms) > 1 and job not in OVERRIDES.get('drop_jobs', []):
         for s in ms:
             s['ov'] = 'job:' + job
+
+# ---- alternatives: which overlapping skills are real alternatives, in what order, and how to choose ----
+if os.path.exists(f'{B}/alt_out.json'):
+    byid = {x['id']: x for x in skills}
+    for g in json.load(open(f'{B}/alt_out.json')):
+        for it in g['items']:
+            x = byid.get(it['id'])
+            if not x: continue
+            if it['status'] == 'not_alt':
+                x.pop('ov', None)
+            else:
+                x['altStatus'] = it['status']
+                if it.get('rank'): x['altRank'] = it['rank']
+                if it.get('choose'): x['choose'] = it['choose']
+
 # rich pages carry their own overlap
 for s in skills:
     if s.get('key') in ('inbox', 'gmail'):
