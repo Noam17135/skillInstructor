@@ -1,7 +1,7 @@
 import json, os
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 S = json.load(open(f'{ROOT}/data/skills.json'))['skills']
-SITE = 'https://noam17135.github.io/skillInstructor'
+SITE = 'https://skillforyou.pages.dev'
 NEED = {'docs': 'מסמכים', 'data': 'טבלאות ונתונים', 'slides': 'מצגות', 'office': 'מייל ומשימות', 'writing': 'כתיבה ומחקר', 'business': 'עסק וכספים',
         'marketing': 'שיווק ומכירות', 'design': 'עיצוב ומדיה', 'dev': 'פיתוח', 'security': 'אבטחה', 'tokens': 'חיסכון בטוקנים'}
 title_of = {s.get('ov'): [] for s in S}

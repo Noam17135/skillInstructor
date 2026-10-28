@@ -1,6 +1,6 @@
 # SkillForYou
 
-מדריך פשוט בעברית לסקילים של AI. אתר סטטי (HTML, CSS ו־JavaScript, בלי שלב בנייה), שמתפרסם ב־GitHub Pages, בכתובת https://noam17135.github.io/skillInstructor/ בכל דחיפה ל־main.
+מדריך פשוט בעברית לסקילים של AI. אתר סטטי (HTML, CSS ו־JavaScript, בלי שלב בנייה), שמתפרסם ב־Cloudflare Pages: https://skillforyou.pages.dev בכל דחיפה ל־main.
 
 - `index.html`, `assets/`: האתר
 - `data/skills.json`: הקטלוג

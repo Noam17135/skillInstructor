@@ -86,7 +86,7 @@
     }
     return S.filter(function (s) { return st.need === 'all' || s.need === st.need; });
   }
-  var SITE = 'https://noam17135.github.io/skillInstructor/';
+  var SITE = 'https://skillforyou.pages.dev/';
   function askAI(text, tool) {
     var prompt = 'אני מחפש סקילים (SKILL.md) לכלי ה־AI שלי' + (tool ? ' (' + tool + ')' : '') + '. זה מה שאני צריך: ' + text +
       '\nתעבור על הקטלוג של SkillForYou בכתובת ' + SITE + 'llms.txt ותמליץ לי על סקיל אחד לכל צורך, בלי סקילים חופפים. לכל סקיל תסביר במשפט למה הוא מתאים ותצרף את הקישור לעמוד שלו.';
