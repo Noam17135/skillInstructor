@@ -593,7 +593,7 @@
     if (e.target.classList.contains('req')) { sendForm(e.target); }
   });
   /* Forms are sent to Formspree (free tier), which forwards them by email. Set the form id here. */
-  var FORM_ENDPOINT = window.SF_FORM || '';
+  var FORM_ENDPOINT = window.SF_FORM || 'https://formspree.io/f/xkjjbkaq';
   function sendForm(form) {
     var fd = new FormData(form);
     if (fd.get('_gotcha')) return;                  // spam trap filled: silently ignore
@@ -601,6 +601,7 @@
     if (!hasText) { toast('נא למלא לפחות שדה אחד.'); return; }
     fd.append('page', location.hash || '#/');
     fd.append('type', form.getAttribute('data-type') || 'request');
+    fd.append('_subject', form.getAttribute('data-type') === 'report' ? 'דיווח על סקיל מהאתר' : 'בקשת סקיל מהאתר');
     if (!FORM_ENDPOINT) { toast('הטופס עוד לא מחובר לשליחה. נחבר אותו בקרוב.'); return; }
     var btn = form.querySelector('[type=submit]'); if (btn) { btn.disabled = true; btn.textContent = 'שולח…'; }
     fetch(FORM_ENDPOINT, { method: 'POST', body: fd, headers: { Accept: 'application/json' } })
