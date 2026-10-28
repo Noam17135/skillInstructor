@@ -1,4 +1,4 @@
-/* SkillFit – static site. Hash routing, no build step. */
+/* SkillForYou – static site. Hash routing, no build step. */
 (function () {
   'use strict';
 
@@ -89,7 +89,7 @@
   var SITE = 'https://noam17135.github.io/skillInstructor/';
   function askAI(text, tool) {
     var prompt = 'אני מחפש סקילים (SKILL.md) לכלי ה־AI שלי' + (tool ? ' (' + tool + ')' : '') + '. זה מה שאני צריך: ' + text +
-      '\nתעבור על הקטלוג של SkillFit בכתובת ' + SITE + 'llms.txt ותמליץ לי על סקיל אחד לכל צורך, בלי סקילים חופפים. לכל סקיל תסביר במשפט למה הוא מתאים ותצרף את הקישור לעמוד שלו.';
+      '\nתעבור על הקטלוג של SkillForYou בכתובת ' + SITE + 'llms.txt ותמליץ לי על סקיל אחד לכל צורך, בלי סקילים חופפים. לכל סקיל תסביר במשפט למה הוא מתאים ותצרף את הקישור לעמוד שלו.';
     var e = encodeURIComponent(prompt);
     return '<div class="box" style="background:var(--purple)"><strong style="font-family:var(--head);font-weight:400;font-size:24px">רוצים לנסח חופשי לגמרי?</strong>' +
       '<span style="font-size:17px">תשאלו את ה־AI שלכם. הכנו לו את השאלה, כולל הקישור לקטלוג שלנו.</span>' +
@@ -233,7 +233,7 @@
   }
   function installBox(s) {
     return '<section class="installbox in" id="installbox"><strong>איך מתקינים</strong>' +
-      '<span style="font-size:18px">ההתקנה נעשית ישירות מהמקור של היוצר. SkillFit לא מארח את הסקיל ולא בודק את הקוד שלו.</span>' +
+      '<span style="font-size:18px">ההתקנה נעשית ישירות מהמקור של היוצר. SkillForYou לא מארח את הסקיל ולא בודק את הקוד שלו.</span>' +
       (s.url ? '<a href="' + esc(s.url) + '" target="_blank" rel="noopener">למקור של הסקיל ↗</a>' : '') +
       (s.cmd ? '<span style="font-size:14px;color:#D0D0D0">למתקדמים: פקודת התקנה בטרמינל</span><code dir="ltr">' + esc(s.cmd) + '</code>' : '') +
       (s.cmdNote ? '<span style="font-size:15px;color:#E6E6E6">' + esc(s.cmdNote) + '</span>' : '') + '</section>';
@@ -498,7 +498,7 @@
   }
   function legal() {
     return '<div class="wrap page" style="max-width:1000px;gap:28px"><section class="page-head in"><h1>מידע משפטי</h1><span class="tag" style="align-self:flex-start;background:var(--pink)">טיוטה לבדיקת עורך דין</span></section>' +
-      '<article id="terms" class="box shadow"><h2>תנאי שימוש</h2><ul style="font-size:17px"><li>SkillFit הוא מדריך מידע. הוא לא מפתח, לא מארח ולא בודק את הקוד של הסקילים.</li><li>כל סקיל מותקן ישירות מהמקור של היוצר, ובאחריות המשתמש.</li><li>המידע מבוסס על מקורות ציבוריים ועשוי להשתנות. כל מידע שלא נבדק מסומן ככזה.</li><li>אין באתר ייעוץ משפטי, פיננסי או מקצועי, גם כשמוצגים סקילים בתחומים האלה.</li></ul></article>' +
+      '<article id="terms" class="box shadow"><h2>תנאי שימוש</h2><ul style="font-size:17px"><li>SkillForYou הוא מדריך מידע. הוא לא מפתח, לא מארח ולא בודק את הקוד של הסקילים.</li><li>כל סקיל מותקן ישירות מהמקור של היוצר, ובאחריות המשתמש.</li><li>המידע מבוסס על מקורות ציבוריים ועשוי להשתנות. כל מידע שלא נבדק מסומן ככזה.</li><li>אין באתר ייעוץ משפטי, פיננסי או מקצועי, גם כשמוצגים סקילים בתחומים האלה.</li></ul></article>' +
       '<article id="privacy" class="box"><h2>מדיניות פרטיות</h2><ul style="font-size:17px"><li>אין באתר הרשמה, חשבונות או רשימת תפוצה.</li><li>האתר משתמש ב־Cloudflare Web Analytics כדי לספור כניסות לעמודים. הכלי לא משתמש בעוגיות, לא שומר מידע בדפדפן ולא עוקב אחרי גולשים בין אתרים. נשמרים רק נתונים מצטברים, כמו מספר כניסות, מדינה, סוג מכשיר ודפדפן.</li><li>בטופס הדיווח, כתובת המייל היא רשות, ומשמשת רק לחזרה אליך.</li><li>לשאלות על המידע שלך: [כתובת מייל ליצירת קשר].</li></ul></article>' +
       '<article id="a11y" class="box"><h2>הצהרת נגישות</h2><p style="font-size:17px;line-height:1.7">האתר נבנה לפי התקן הישראלי 5568, ברמת AA. אפשר לנווט בכל האתר עם המקלדת, הטקסט עומד ביחסי ניגודיות מומלצים, ומי שהגדיר במכשיר הפחתת תנועה יקבל את האתר בלי הנפשות.</p><p style="font-size:17px;line-height:1.7">נתקלת בבעיית נגישות? אפשר לפנות אל [שם רכז/ת הנגישות], בטלפון [מספר] או במייל [כתובת].</p><span class="note" style="font-weight:600">ההצהרה עודכנה: [תאריך הבדיקה האחרונה]</span></article>' +
       '<article id="report" class="box" style="background:var(--green)"><h2>דיווח או בקשת עדכון</h2><p style="font-size:17px">יש טעות במידע על סקיל? אתה היוצר ורוצה לעדכן או להסיר אותו? ספר לנו, ונבדוק.</p>' +
@@ -518,7 +518,7 @@
   function route(keepScroll) {
     var path = (location.hash || '#/').slice(1) || '/';
     var parts = path.split('/').filter(Boolean);
-    var html, title = 'SkillFit · מדריך פשוט לסקילים של AI', active = '/';
+    var html, title = 'SkillForYou · מדריך פשוט לסקילים של AI', active = '/';
     if (!parts.length) html = home();
     else if (parts[0] === 'skill') {
       var s = byId[decodeURIComponent(parts[1] || '')];
@@ -527,15 +527,15 @@
         fetch('data/d/' + encodeURIComponent(s.id) + '.json?v=' + (window.SF_V || '')).then(function (r) { return r.ok ? r.json() : {}; }, function () { return {}; })
           .then(function (d) { Object.assign(s, d); s._loaded = true; if ((location.hash || '').indexOf('#/skill/' + s.id) === 0) route(true); });
       } else html = skillPage(s);
-      if (s) title = s.title + ' · SkillFit';
+      if (s) title = s.title + ' · SkillForYou';
     }
-    else if (parts[0] === 'build') { html = build(); active = '/build'; title = 'בנו לי סט · SkillFit'; }
-    else if (parts[0] === 'guides') { html = guides(); active = '/guides'; title = 'מדריכים · SkillFit'; }
-    else if (parts[0] === 'guide') { html = guide(parts[1]); active = '/guides'; title = 'מדריך · SkillFit'; }
-    else if (parts[0] === 'students') { html = students(); active = '/guides'; title = 'סקילים לסטודנטים · SkillFit'; }
-    else if (parts[0] === 'models') { html = models(); active = '/models'; title = 'מודלים · SkillFit'; }
-    else if (parts[0] === 'updates') { html = updates(); active = '/updates'; title = 'עדכונים · SkillFit'; }
-    else if (parts[0] === 'legal') { html = legal(); active = ''; title = 'מידע משפטי · SkillFit'; }
+    else if (parts[0] === 'build') { html = build(); active = '/build'; title = 'בנו לי סט · SkillForYou'; }
+    else if (parts[0] === 'guides') { html = guides(); active = '/guides'; title = 'מדריכים · SkillForYou'; }
+    else if (parts[0] === 'guide') { html = guide(parts[1]); active = '/guides'; title = 'מדריך · SkillForYou'; }
+    else if (parts[0] === 'students') { html = students(); active = '/guides'; title = 'סקילים לסטודנטים · SkillForYou'; }
+    else if (parts[0] === 'models') { html = models(); active = '/models'; title = 'מודלים · SkillForYou'; }
+    else if (parts[0] === 'updates') { html = updates(); active = '/updates'; title = 'עדכונים · SkillForYou'; }
+    else if (parts[0] === 'legal') { html = legal(); active = ''; title = 'מידע משפטי · SkillForYou'; }
     else html = notFound();
     $('#nav').innerHTML = NAV.map(function (n) {
       return '<a class="pill" href="#' + n[0] + '"' + (n[0] === active ? ' aria-current="page"' : '') + '>' + n[1] + '</a>';

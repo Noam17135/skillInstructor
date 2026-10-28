@@ -1,4 +1,4 @@
-/* SkillFit matching engine: free-text Hebrew/English matching against the catalog.
+/* SkillForYou matching engine: free-text Hebrew/English matching against the catalog.
    Runs entirely in the browser. No AI at query time: each skill carries a vocabulary
    (title, description, example request, and a generated list of everyday phrasings),
    and queries are matched with light Hebrew stemming, typo tolerance and IDF weighting. */
