@@ -123,8 +123,8 @@
     var prompt = 'אני מחפש סקילים (SKILL.md) לכלי ה־AI שלי' + (tool ? ' (' + tool + ')' : '') + '. זה מה שאני צריך: ' + text +
       '\nתעבור על הקטלוג של SkillForYou בכתובת ' + SITE + 'llms.txt ותמליץ לי על סקיל אחד לכל צורך, בלי סקילים חופפים. לכל סקיל תסביר במשפט למה הוא מתאים ותצרף את הקישור לעמוד שלו.';
     var e = encodeURIComponent(prompt);
-    return '<div class="box" style="background:var(--purple)"><strong style="font-family:var(--head);font-weight:400;font-size:24px">רוצים לנסח חופשי לגמרי?</strong>' +
-      '<span style="font-size:17px">תשאלו את ה־AI שלכם. הכנו לו את השאלה, כולל הקישור לקטלוג שלנו.</span>' +
+    return '<div class="box" style="background:var(--purple)"><strong style="font-family:var(--head);font-weight:400;font-size:19px">רוצים לנסח חופשי לגמרי?</strong>' +
+      '<span style="font-size:16px">תשאלו את ה־AI שלכם. הכנו לו את השאלה, כולל הקישור לקטלוג שלנו.</span>' +
       '<div style="display:flex;flex-wrap:wrap;gap:10px"><a class="btn shadow" target="_blank" rel="noopener" href="https://claude.ai/new?q=' + e + '">לשאול את Claude ↗</a>' +
       '<a class="btn shadow" target="_blank" rel="noopener" href="https://chatgpt.com/?q=' + e + '">לשאול את ChatGPT ↗</a></div></div>';
   }
@@ -146,8 +146,8 @@
   }
   var requestBox = function (prefill) {
     return '<div class="box shadow" style="align-items:flex-start">' +
-      '<strong style="font-family:var(--head);font-weight:400;font-size:28px">עוד אין לנו סקיל לזה.</strong>' +
-      '<span style="font-size:18px">ספר לנו מה ניסית לעשות, ונחפש סקיל מתאים. ככה אנחנו יודעים מה להוסיף לקטלוג.</span>' +
+      '<strong style="font-family:var(--head);font-weight:400;font-size:21px">עוד אין לנו סקיל לזה.</strong>' +
+      '<span style="font-size:16px">ספר לנו מה ניסית לעשות, ונחפש סקיל מתאים. ככה אנחנו יודעים מה להוסיף לקטלוג.</span>' +
       '<form class="req" data-type="request" style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:640px"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">' +
       '<label class="field">מה ניסית לעשות?<textarea name="need" rows="3" placeholder="למשל: לסכם הקלטה של פגישה ולשלוח לצוות">' + esc(prefill || '') + '</textarea></label>' +
       '<label class="field">באיזה כלי AI אתה עובד? (רשות)<input name="tool" type="text" placeholder="למשל: Claude, ChatGPT, Cursor"></label>' +
@@ -166,15 +166,15 @@
       var groups = [];
       shown.forEach(function (s) { var g = groups[groups.length - 1]; if (!g || g.need !== s.need) groups.push(g = { need: s.need, items: [] }); g.items.push(s); });
       grid = groups.map(function (g) {
-        return '<h3 style="font-family:var(--head);font-weight:400;font-size:26px;margin-top:8px"><span class="tag" style="background:' + C[g.need].color + ';font-size:inherit;font-family:inherit">' + esc(C[g.need].label) + '</span></h3><div class="grid">' + g.items.map(card).join('') + '</div>';
+        return '<h3 style="font-family:var(--head);font-weight:400;font-size:20px;margin-top:8px"><span class="tag" style="background:' + C[g.need].color + ';font-size:inherit;font-family:inherit">' + esc(C[g.need].label) + '</span></h3><div class="grid">' + g.items.map(card).join('') + '</div>';
       }).join('');
     } else grid = '<div class="grid">' + shown.map(card).join('') + '</div>';
-    return '<div class="sec-head"><h2>' + esc(heading) + '</h2><span style="font-size:16px;font-weight:700" aria-live="polite">' + list.length + ' סקילים</span></div>' +
-      '<div class="row-chips" role="group" aria-label="סינון לפי צורך">' + chips(NEEDS, 'need', st.need) + '</div>' +
-      '<div class="row-chips" role="group" aria-label="סינון לפי כלי AI"><span style="font-size:16px;font-weight:700">עובד עם:</span>' + chips(FAMS, 'fam', st.fam) + '</div>' +
-      '<div class="row-chips" role="group" aria-label="מיון"><span style="font-size:16px;font-weight:700">מיון:</span>' + chips(sorts, 'sort', st.sort) + '</div>' +
-      (list.unstated ? '<p class="note" style="font-size:15px">עוד ' + list.unstated + ' סקילים לא מציינים בתיעוד עם אילו כלים הם עובדים. הפורמט פתוח, אז רובם יעבדו גם ב־' + esc(FAMS.filter(function (f) { return f.id === st.fam; })[0].label) + '. <button type="button" class="linkbtn" data-act="anytool" style="font:inherit;font-weight:800;text-decoration:underline;background:none;border:0;cursor:pointer;padding:0">להציג גם אותם</button></p>' : '') +
-      (st.sort === 'pop' ? '<p class="note" style="font-size:15px">לפי מספר ההתקנות ב־skills.sh, ואחריו לפי הכוכבים בגיטהאב.</p>' : '') +
+    return '<div class="sec-head"><h2>' + esc(heading) + '</h2><span style="font-size:15px;font-weight:700" aria-live="polite">' + list.length + ' סקילים</span></div>' +
+      '<div class="row-chips scroll" role="group" aria-label="סינון לפי צורך">' + chips(NEEDS, 'need', st.need) + '</div>' +
+      '<div class="row-chips scroll" role="group" aria-label="סינון לפי כלי AI"><span style="font-size:15px;font-weight:700">עובד עם:</span>' + chips(FAMS, 'fam', st.fam) + '</div>' +
+      '<div class="row-chips scroll" role="group" aria-label="מיון"><span style="font-size:15px;font-weight:700">מיון:</span>' + chips(sorts, 'sort', st.sort) + '</div>' +
+      (list.unstated ? '<p class="note" style="font-size:14px">עוד ' + list.unstated + ' סקילים לא מציינים בתיעוד עם אילו כלים הם עובדים. הפורמט פתוח, אז רובם יעבדו גם ב־' + esc(FAMS.filter(function (f) { return f.id === st.fam; })[0].label) + '. <button type="button" class="linkbtn" data-act="anytool" style="font:inherit;font-weight:800;text-decoration:underline;background:none;border:0;cursor:pointer;padding:0">להציג גם אותם</button></p>' : '') +
+      (st.sort === 'pop' ? '<p class="note" style="font-size:14px">לפי מספר ההתקנות ב־skills.sh, ואחריו לפי הכוכבים בגיטהאב.</p>' : '') +
       (list.length ? grid +
         (list.length > st.shown ? '<button type="button" class="btn shadow more" data-act="more">להציג עוד (' + (list.length - st.shown) + ')</button>' : '')
         : requestBox(q) + (q ? askAI(q, '') : ''));
@@ -190,20 +190,20 @@
       '<div class="row-chips"><span>נסו:</span>' + tries.map(function (t) {
         return '<button type="button" class="chip dashed" data-act="try" data-v="' + esc(t[1]) + '">' + esc(t[0]) + '</button>';
       }).join('') + '</div>' +
-      '<a class="btn shadow" href="#/build" style="min-height:56px;border-radius:18px"><span>צריך כמה דברים? <strong style="font-family:var(--head);font-weight:400">נרכיב לך סט בלי כפילויות</strong></span>' + ICON.fwd + '</a></section>' +
+      '<a class="btn shadow" href="#/build" style="min-height:44px;border-radius:18px"><span>צריך כמה דברים? <strong style="font-family:var(--head);font-weight:400">נרכיב לך סט בלי כפילויות</strong></span>' + ICON.fwd + '</a></section>' +
       '<section id="catalog" style="display:flex;flex-direction:column;gap:24px">' + catalogBody() + '</section>' +
-      '<section class="steps3"><div style="grid-column:1/-1"><h2 style="font-size:40px">איך זה עובד</h2></div>' +
+      '<section class="steps3"><div style="grid-column:1/-1"><h2 style="font-size:var(--h2)">איך זה עובד</h2></div>' +
       step('#7CD8FF', 1, 'מוצאים', 'כותבים מה רוצים לעשות, או בוחרים צורך.') +
       step('#9BE38A', 2, 'מתקינים', 'מורידים את הסקיל מהמקור ומעלים אותו לאפליקציה.') +
       step('#FFB86B', 3, 'מבקשים', 'כותבים ל־AI כרגיל. הוא משתמש בסקיל לבד כשצריך.') + '</section>' +
       '<section class="less"><div style="display:flex;flex-direction:column;gap:12px;max-width:760px"><h2>פחות סקילים, יותר תוצאות</h2>' +
-      '<p style="font-size:19px;line-height:1.6">באתרים אחרים מציעים להוריד חבילה שלמה של עשרות סקילים בבת אחת. זה נשמע נוח, אבל בדרך כלל זה עובד פחות טוב.</p></div>' +
-      '<div class="cols"><div><strong>כפילויות מבלבלות</strong><span style="font-size:17px">בחבילות יש הרבה סקילים שעושים כמעט אותו דבר. כשיש שניים לאותה משימה, ה־AI לא תמיד יודע באיזה לבחור.</span></div>' +
-      '<div><strong>כל סקיל תופס מקום</strong><span style="font-size:17px">ה־AI צריך לדעת על כל סקיל שמותקן אצלך, גם על אלה שלא תשתמש בהם אף פעם.</span></div>' +
-      '<div style="background:var(--pink)"><strong>קחו רק מה שאתם צריכים</strong><span style="font-size:17px">תתחילו מהדבר שאתם עושים הכי הרבה, תתקינו סקיל אחד בשבילו, ותוסיפו עוד רק כשיש צורך.</span></div></div></section></div>';
+      '<p style="font-size:17px;line-height:1.6">באתרים אחרים מציעים להוריד חבילה שלמה של עשרות סקילים בבת אחת. זה נשמע נוח, אבל בדרך כלל זה עובד פחות טוב.</p></div>' +
+      '<div class="cols"><div><strong>כפילויות מבלבלות</strong><span style="font-size:16px">בחבילות יש הרבה סקילים שעושים כמעט אותו דבר. כשיש שניים לאותה משימה, ה־AI לא תמיד יודע באיזה לבחור.</span></div>' +
+      '<div><strong>כל סקיל תופס מקום</strong><span style="font-size:16px">ה־AI צריך לדעת על כל סקיל שמותקן אצלך, גם על אלה שלא תשתמש בהם אף פעם.</span></div>' +
+      '<div style="background:var(--pink)"><strong>קחו רק מה שאתם צריכים</strong><span style="font-size:16px">תתחילו מהדבר שאתם עושים הכי הרבה, תתקינו סקיל אחד בשבילו, ותוסיפו עוד רק כשיש צורך.</span></div></div></section></div>';
   }
   function step(bg, n, t, d) {
-    return '<div class="step" style="background:' + bg + '"><span class="num">' + n + '</span><strong>' + t + '</strong><span style="font-size:17px">' + d + '</span></div>';
+    return '<div class="step" style="background:' + bg + '"><span class="num">' + n + '</span><strong>' + t + '</strong><span style="font-size:16px">' + d + '</span></div>';
   }
 
   /* ---------- skill page ---------- */
@@ -235,8 +235,8 @@
       '<a class="btn back" href="#/">' + ICON.back + 'חזרה לקטלוג</a>' +
       '<section class="skill-hero in"><div class="main">' +
       '<span class="tag" style="align-self:flex-start;background:' + C[s.need].color + '">' + esc(C[s.need].label) + '</span>' +
-      '<h1>' + esc(s.title) + '</h1><p style="font-size:21px;line-height:1.5;font-weight:500;max-width:700px">' + esc(s.what) + '</p>' +
-      (s.why ? '<p style="font-size:18px;line-height:1.6;max-width:720px;color:#2A2A2A"><strong>למה זה עוזר: </strong>' + esc(s.why) + '</p>' : '') +
+      '<h1>' + esc(s.title) + '</h1><p style="font-size:17px;line-height:1.5;font-weight:500;max-width:700px">' + esc(s.what) + '</p>' +
+      (s.why ? '<p style="font-size:16px;line-height:1.6;max-width:720px;color:#2A2A2A"><strong>למה זה עוזר: </strong>' + esc(s.why) + '</p>' : '') +
       (s.best && s.best.length ? '<div class="row-chips"><span style="font-weight:700">מתאים במיוחד ל:</span>' + s.best.map(function (b) {
         return '<span class="tag" style="background:var(--cream);font-weight:600">' + esc(b) + '</span>'; }).join('') + '</div>' : '') +
       '<div class="row-chips" style="font-weight:400"><span>מאת <strong>' + esc(s.by) + '</strong></span>' +
@@ -253,10 +253,10 @@
         return '<li><span class="num" style="background:var(--yellow)">' + (i + 1) + '</span><span>' + esc(t) + '</span></li>'; }).join('') + '</ol></section>' : '') +
       '<section class="box" style="background:var(--green)"><h2>איך מתקינים</h2><ol class="st">' + steps.map(function (t, i) {
         return '<li><span class="num">' + (i + 1) + '</span><span>' + esc(t) + '</span></li>'; }).join('') + '</ol></section>' +
-      (s.tryAsk ? '<section class="box" style="background:var(--blue)"><div><h2>נסו את זה</h2><span style="font-size:17px">אחרי ההתקנה, בקשו את זה ותבדקו את התוצאה. זה לוקח כמה דקות.</span></div>' +
+      (s.tryAsk ? '<section class="box" style="background:var(--blue)"><div><h2>נסו את זה</h2><span style="font-size:16px">אחרי ההתקנה, בקשו את זה ותבדקו את התוצאה. זה לוקח כמה דקות.</span></div>' +
         '<div class="try-q"><p>״' + esc(s.tryAsk) + '״</p><button type="button" data-act="copy" data-v="' + esc(s.tryAsk) + '" aria-label="העתקת הבקשה">העתקה</button></div>' +
-        '<div class="two"><div><strong style="font-size:17px">ככה נראית תוצאה טובה</strong><ul>' + (s.good || []).map(function (g) { return '<li>' + esc(g) + '</li>'; }).join('') + '</ul></div>' +
-        '<div><strong style="font-size:17px">סימנים שמשהו לא עובד</strong><ul>' + (s.bad || []).map(function (g) { return '<li>' + esc(g) + '</li>'; }).join('') + '</ul></div></div></section>' : '') +
+        '<div class="two"><div><strong style="font-size:16px">ככה נראית תוצאה טובה</strong><ul>' + (s.good || []).map(function (g) { return '<li>' + esc(g) + '</li>'; }).join('') + '</ul></div>' +
+        '<div><strong style="font-size:16px">סימנים שמשהו לא עובד</strong><ul>' + (s.bad || []).map(function (g) { return '<li>' + esc(g) + '</li>'; }).join('') + '</ul></div></div></section>' : '') +
       (s.nots && s.nots.length ? '<section class="box"><h2>מה הוא לא עושה</h2><ul>' + s.nots.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul></section>' : '') +
       '<section style="display:flex;flex-direction:column;gap:12px"><button type="button" class="btn shadow" style="align-self:flex-start" data-act="adv" aria-expanded="' + st.adv + '" aria-controls="adv">' +
       '<span style="display:inline-flex;transition:transform .25s ease;' + (st.adv ? 'transform:rotate(180deg)' : '') + '">' + ICON.chev + '</span>פרטים למתקדמים</button>' +
@@ -267,10 +267,10 @@
       '</section>' +
       '<section class="box sm"><h2>האם זה בטוח</h2>' + trust.map(function (t) {
         return '<div class="trust"><span class="dot" style="background:' + t[1] + '">' + mark(t[2]) + '</span><span>' + esc(t[0]) + '</span></div>'; }).join('') + '</section>' +
-      '<section class="box sm" style="background:var(--cream);padding:20px 24px"><strong style="font-size:17px">מצאת בעיה בסקיל? אתה היוצר?</strong><a class="btn" style="align-self:flex-start;min-height:46px" href="#/legal/report">לדיווח או לבקשת עדכון</a></section>' +
-      '<section class="box sm" style="background:var(--purple)"><h2>מה צריך כדי שיעבוד</h2><span style="font-size:16px">' + esc(s.needs || 'עוד לא בדקנו. הפרטים נמצאים במקור של הסקיל.') + '</span></section>' +
-      (overlaps.length ? '<section class="box sm" style="background:#FFF6D1"><h2>חלופות</h2><span style="font-size:16px">הסקילים האלה עושים משימה דומה. בחרו אחד, לפי מה שמתאים לכם.</span>' +
-        (s.choose ? '<div class="alt-row" style="background:#fff;border-style:dashed"><strong style="font-size:15px">הסקיל הזה</strong><span>' + esc(s.choose) + '</span></div>' : '') +
+      '<section class="box sm" style="background:var(--cream);padding:20px 24px"><strong style="font-size:16px">מצאת בעיה בסקיל? אתה היוצר?</strong><a class="btn" style="align-self:flex-start;min-height:40px" href="#/legal/report">לדיווח או לבקשת עדכון</a></section>' +
+      '<section class="box sm" style="background:var(--purple)"><h2>מה צריך כדי שיעבוד</h2><span style="font-size:15px">' + esc(s.needs || 'עוד לא בדקנו. הפרטים נמצאים במקור של הסקיל.') + '</span></section>' +
+      (overlaps.length ? '<section class="box sm" style="background:#FFF6D1"><h2>חלופות</h2><span style="font-size:15px">הסקילים האלה עושים משימה דומה. בחרו אחד, לפי מה שמתאים לכם.</span>' +
+        (s.choose ? '<div class="alt-row" style="background:#fff;border-style:dashed"><strong style="font-size:14px">הסקיל הזה</strong><span>' + esc(s.choose) + '</span></div>' : '') +
         overlaps.map(function (o) { return '<a class="alt-row" href="#/skill/' + esc(o.id) + '"><strong>' + esc(o.title) + '</strong>' + (o.choose ? '<span>' + esc(o.choose) + '</span>' : '<span>' + esc(o.what) + '</span>') + '</a>'; }).join('') + '</section>' : '') +
       (pairs.length ? '<section class="box sm"><h2>משתלב טוב עם</h2>' + pairs.map(function (o) {
         return '<a class="link-row" href="#/skill/' + esc(o.id) + '"><span>' + esc(o.title) + '</span>' + ICON.fwd + '</a>'; }).join('') + '</section>' : '') +
@@ -278,10 +278,10 @@
   }
   function installBox(s) {
     return '<section class="installbox in" id="installbox"><strong>איך מתקינים</strong>' +
-      '<span style="font-size:18px">ההתקנה נעשית ישירות מהמקור של היוצר. SkillForYou לא מארח את הסקיל ולא בודק את הקוד שלו.</span>' +
+      '<span style="font-size:16px">ההתקנה נעשית ישירות מהמקור של היוצר. SkillForYou לא מארח את הסקיל ולא בודק את הקוד שלו.</span>' +
       (s.url ? '<a href="' + esc(s.url) + '" target="_blank" rel="noopener">למקור של הסקיל ↗</a>' : '') +
-      (s.cmd ? '<span style="font-size:14px;color:#D0D0D0">למתקדמים: פקודת התקנה בטרמינל</span><code dir="ltr">' + esc(s.cmd) + '</code>' : '') +
-      (s.cmdNote ? '<span style="font-size:15px;color:#E6E6E6">' + esc(s.cmdNote) + '</span>' : '') + '</section>';
+      (s.cmd ? '<span style="font-size:13px;color:#D0D0D0">למתקדמים: פקודת התקנה בטרמינל</span><code dir="ltr">' + esc(s.cmd) + '</code>' : '') +
+      (s.cmdNote ? '<span style="font-size:14px;color:#E6E6E6">' + esc(s.cmdNote) + '</span>' : '') + '</section>';
   }
 
   /* ---------- set builder ---------- */
@@ -306,11 +306,11 @@
       taken[p.s.id] = 1; if (p.s.ov) taken['ov:' + p.s.ov] = 1;
       items.push({ s: p.s, label: p.words.join(', '), reason: '', warn: P ? P.warnings(p.s, st.tool) : [], alts: [] });
     });
-    if (!items.length) return '<section class="box in" style="font-size:18px">עוד לא הבנתי מה צריך. נסו לתאר משימות, למשל ״לבנות מצגות ללקוחות״ או ״לענות מהר למיילים״.</section>' + askAI(text, st.tool);
+    if (!items.length) return '<section class="box in" style="font-size:16px">עוד לא הבנתי מה צריך. נסו לתאר משימות, למשל ״לבנות מצגות ללקוחות״ או ״לענות מהר למיילים״.</section>' + askAI(text, st.tool);
     var h = '<section style="display:flex;flex-direction:column;gap:22px">';
     var pin = (pl.parsed.inputs.length ? pl.parsed.inputs : pl.parsed.neutral || []).filter(function (x, i, a) { return i === 0 || ['report', 'data', 'text'].indexOf(x) === -1; }), pout = pl.parsed.outputs;
     var pu = pl.parsed.used || {}; r.leftover = r.leftover.filter(function (w) { return !pu[w]; });
-    if (pl.picks.length && (pin.length || pout.length)) h += '<div class="box" style="background:var(--cream);padding:18px 24px;gap:6px"><strong style="font-size:18px">המסלול שזיהינו</strong><span style="font-size:17px">' +
+    if (pl.picks.length && (pin.length || pout.length)) h += '<div class="box" style="background:var(--cream);padding:18px 24px;gap:6px"><strong style="font-size:16px">המסלול שזיהינו</strong><span style="font-size:16px">' +
       (pin.length ? 'מתחילים מ: <b>' + esc(pin.map(function (x) { return FL[x]; }).join(', ')) + '</b>' : '') + (pin.length && pout.length ? ' ← ' : '') +
       (pout.length ? 'רוצים לקבל: <b>' + esc(pout.map(function (x) { return FL[x]; }).join(', ')) + '</b>' : '') +
       (pl.tool ? ' · בכלי: <b>' + esc(pl.tool) + '</b>' : '') + '</span><span class="note">בחרנו לפי מה שכתוב בתיעוד של כל סקיל: מה הוא קורא, מה הוא מייצר ומה הוא צריך.</span></div>';
@@ -322,20 +322,20 @@
       return '<div class="card ' + TILTS[i % 4] + '" style="cursor:default;gap:12px;animation-delay:' + i * 0.06 + 's">' +
         '<span class="tag" style="align-self:flex-start;background:' + C[s.need].color + '">בשביל: ' + esc(p.label) + '</span>' +
         '<span class="t">' + esc(s.title) + '</span><span class="w">' + esc(s.what) + '</span>' +
-        (p.reason ? '<span style="font-size:15px">' + esc(p.reason) + '</span>' : '') +
-        '<span style="font-size:14px;font-weight:600;color:var(--muted)">' + esc(s.by) + ' · ' + esc(s.evShort) + '</span>' +
-        (p.warn.length ? '<div style="padding:8px 12px;background:#FFE08A;border:2px solid var(--ink);border-radius:12px;font-size:14px;font-weight:600;display:flex;flex-direction:column;gap:4px">' +
+        (p.reason ? '<span style="font-size:14px">' + esc(p.reason) + '</span>' : '') +
+        '<span style="font-size:13px;font-weight:600;color:var(--muted)">' + esc(s.by) + ' · ' + esc(s.evShort) + '</span>' +
+        (p.warn.length ? '<div style="padding:8px 12px;background:#FFE08A;border:2px solid var(--ink);border-radius:12px;font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:4px">' +
           p.warn.map(function (w) { return '<span>' + esc(w) + '</span>'; }).join('') + '</div>' : '') +
-        (p.alts.length ? '<span style="font-size:14px">חלופות: ' + p.alts.map(function (o) { return '<a href="#/skill/' + esc(o.id) + '" style="font-weight:700">' + esc(o.title) + '</a>'; }).join(' · ') + '</span>' : '') +
-        '<a class="btn yellow" style="align-self:flex-start;margin-top:auto;min-height:46px" href="#/skill/' + esc(s.id) + '">לעמוד הסקיל</a></div>';
+        (p.alts.length ? '<span style="font-size:13px">חלופות: ' + p.alts.map(function (o) { return '<a href="#/skill/' + esc(o.id) + '" style="font-weight:700">' + esc(o.title) + '</a>'; }).join(' · ') + '</span>' : '') +
+        '<a class="btn yellow" style="align-self:flex-start;margin-top:auto;min-height:40px" href="#/skill/' + esc(s.id) + '">לעמוד הסקיל</a></div>';
     }).join('') + '</div>';
     r.skipped = r.skipped.filter(function (k) { return !taken[k.s.id]; });
-    if (r.skipped.length) h += '<div class="box" style="background:var(--cream);gap:10px;padding:22px 26px"><strong style="font-size:19px">גם אלה מתאימים, אבל לא הוספנו אותם</strong>' +
-      '<span style="font-size:16px;color:var(--muted)">כל אחד מהם עושה כמעט אותו דבר כמו סקיל שכבר בסט. שני סקילים לאותה משימה רק מבלבלים את ה־AI.</span>' + r.skipped.map(function (k) {
-      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:16px"><a href="#/skill/' + esc(k.s.id) + '" style="font-weight:700">' + esc(k.s.title) + '</a><span>במקום ״' + esc(k.instead.title) + '״</span></div>';
+    if (r.skipped.length) h += '<div class="box" style="background:var(--cream);gap:10px;padding:18px 20px"><strong style="font-size:17px">גם אלה מתאימים, אבל לא הוספנו אותם</strong>' +
+      '<span style="font-size:15px;color:var(--muted)">כל אחד מהם עושה כמעט אותו דבר כמו סקיל שכבר בסט. שני סקילים לאותה משימה רק מבלבלים את ה־AI.</span>' + r.skipped.map(function (k) {
+      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:15px"><a href="#/skill/' + esc(k.s.id) + '" style="font-weight:700">' + esc(k.s.title) + '</a><span>במקום ״' + esc(k.instead.title) + '״</span></div>';
     }).join('') + '</div>';
-    if (r.leftover.length >= 2) h += '<p class="note" style="font-size:15px">מילים שלא שייכנו לאף סקיל: ' + esc(r.leftover.slice(0, 6).join(', ')) + '. אם זה צורך חשוב, נסו לנסח אותו כמשימה.</p>';
-    h += '<div class="box" style="background:var(--ink);color:#fff;border-color:var(--ink)"><strong style="font-family:var(--head);font-weight:400;font-size:26px;color:var(--yellow)">איך מתקינים סט</strong><span style="font-size:17px">אחד־אחד, מהעמוד של כל סקיל. מתחילים מזה שתשתמשו בו הכי הרבה, ובודקים אותו לפני שמוסיפים את הבא.</span></div>';
+    if (r.leftover.length >= 2) h += '<p class="note" style="font-size:14px">מילים שלא שייכנו לאף סקיל: ' + esc(r.leftover.slice(0, 6).join(', ')) + '. אם זה צורך חשוב, נסו לנסח אותו כמשימה.</p>';
+    h += '<div class="box" style="background:var(--ink);color:#fff;border-color:var(--ink)"><strong style="font-family:var(--head);font-weight:400;font-size:20px;color:var(--yellow)">איך מתקינים סט</strong><span style="font-size:16px">אחד־אחד, מהעמוד של כל סקיל. מתחילים מזה שתשתמשו בו הכי הרבה, ובודקים אותו לפני שמוסיפים את הבא.</span></div>';
     h += askAI(text, st.tool) + '</section>';
     return h;
   }
@@ -343,11 +343,11 @@
     var tries = ['אני מנהלת קליניקה, טובעת במיילים ורוצה לבדוק חוזים מול ספקים', 'מכין פרזנטציות מדוחות אקסל וכותב פוסטים ללינקדאין', 'מלטש ממשק React ורוצה אנימציות שמרגישות טוב'];
     return '<div class="wrap narrow page"><section class="page-head in"><h1>בנו לי סט</h1>' +
       '<p class="lead" style="max-width:720px">ספרו במילים שלכם מה אתם עושים ומה מעיק עליכם. תוך כדי ההקלדה נרכיב לכם סט קטן מהקטלוג: סקיל אחד לכל צורך, בלי כפילויות.</p></section>' +
-      '<form class="box shadow" id="buildform" style="gap:18px"><label for="bq" style="font-family:var(--head);font-size:26px">מה אתם רוצים שה־AI יעשה בשבילכם?</label>' +
+      '<form class="box shadow" id="buildform" style="gap:18px"><label for="bq" style="font-family:var(--head);font-size:20px">מה אתם רוצים שה־AI יעשה בשבילכם?</label>' +
       '<textarea id="bq" class="big" rows="4" placeholder="למשל: יש לי עסק קטן. אני רוצה עזרה עם המיילים, לבדוק חוזים ולדעת אם יהיה כסף למשכורות">' + esc(st.bq) + '</textarea>' +
       '<div class="row-chips"><span>דוגמאות:</span>' + tries.map(function (t) {
-        return '<button type="button" class="chip dashed" style="font-size:15px;text-align:right" data-act="buildtry" data-v="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>' +
-      '<div class="row-chips" role="group" aria-label="באיזה כלי AI אתם עובדים"><span style="font-size:17px;font-weight:700">באיזה כלי אתם עובדים?</span>' +
+        return '<button type="button" class="chip dashed" style="font-size:14px;text-align:right" data-act="buildtry" data-v="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>' +
+      '<div class="row-chips" role="group" aria-label="באיזה כלי AI אתם עובדים"><span style="font-size:16px;font-weight:700">באיזה כלי אתם עובדים?</span>' +
       [''].concat(TOOLS).map(function (t) {
         return '<button type="button" class="chip" data-act="tool" data-v="' + esc(t) + '" aria-pressed="' + (st.tool === t) + '">' + esc(t || 'לא משנה') + '</button>'; }).join('') + '</div>' +
       '<button type="submit" class="btn pink big" style="align-self:flex-start">תרכיבו לי סט</button></form>' +
@@ -357,26 +357,26 @@
   /* ---------- guides ---------- */
   function guides() {
     return '<div class="wrap narrow page"><section class="page-head in"><h1>מדריכים</h1><p class="lead" style="max-width:720px">מה להתקין לכל סוג עבודה. בכל מדריך 2–3 סקילים בלבד, ולמה דווקא הם.</p></section>' +
-      '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:26px">' + '<a class="card tilt-d" href="#/students" style="background:#C8F7C5;padding:26px;gap:12px"><span class="t" style="font-size:28px">סקילים לסטודנטים</span><span style="font-size:17px">מדעי הנתונים, הנדסה, כלכלה ופסיכולוגיה. לעבודות וללמידה.</span><span style="margin-top:auto;font-size:15px;font-weight:800">לפי תחום · לקריאה</span></a>' + GUIDES.map(function (g, i) {
-        return '<a class="card ' + TILTS[i % 4] + '" href="#/guide/' + g.id + '" style="background:' + g.color + ';padding:26px;gap:12px"><span class="t" style="font-size:28px">' + esc(g.title) + '</span>' +
-          '<span style="font-size:17px">' + esc(g.short) + '</span><span style="margin-top:auto;font-size:15px;font-weight:800">' + g.items.length + ' סקילים · לקריאה</span></a>';
+      '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:26px">' + '<a class="card tilt-d" href="#/students" style="background:#C8F7C5;padding:20px;gap:12px"><span class="t" style="font-size:21px">סקילים לסטודנטים</span><span style="font-size:16px">מדעי הנתונים, הנדסה, כלכלה ופסיכולוגיה. לעבודות וללמידה.</span><span style="margin-top:auto;font-size:14px;font-weight:800">לפי תחום · לקריאה</span></a>' + GUIDES.map(function (g, i) {
+        return '<a class="card ' + TILTS[i % 4] + '" href="#/guide/' + g.id + '" style="background:' + g.color + ';padding:20px;gap:12px"><span class="t" style="font-size:21px">' + esc(g.title) + '</span>' +
+          '<span style="font-size:16px">' + esc(g.short) + '</span><span style="margin-top:auto;font-size:14px;font-weight:800">' + g.items.length + ' סקילים · לקריאה</span></a>';
       }).join('') + '</div></div>';
   }
   function guide(id) {
     var g = GUIDES.filter(function (x) { return x.id === id; })[0];
     if (!g) return notFound();
     return '<div class="wrap page" style="max-width:1000px;gap:28px;padding-top:12px"><a class="btn back" href="#/guides">' + ICON.back + 'כל המדריכים</a>' +
-      '<article class="in" style="display:flex;flex-direction:column;gap:24px"><header class="box" style="background:' + g.color + ';box-shadow:10px 10px 0 var(--ink);border-radius:28px;padding:34px">' +
-      '<h1 style="font-size:clamp(38px,5.5vw,64px);line-height:1">' + esc(g.title) + '</h1><p style="font-size:20px;font-weight:500">' + esc(g.intro) + '</p></header>' +
+      '<article class="in" style="display:flex;flex-direction:column;gap:24px"><header class="box" style="background:' + g.color + ';box-shadow:5px 5px 0 var(--ink);border-radius:20px;padding:24px">' +
+      '<h1 style="font-size:var(--h1);line-height:1">' + esc(g.title) + '</h1><p style="font-size:17px;font-weight:500">' + esc(g.intro) + '</p></header>' +
       g.items.map(function (it, i) {
         var s = byKey[it[0]]; if (!s) return '';
-        return '<section class="box" style="flex-direction:row;flex-wrap:wrap;align-items:center;gap:18px;padding:26px;border-radius:24px"><span class="num" style="width:50px;height:50px;background:var(--yellow)">' + (i + 1) + '</span>' +
-          '<div style="flex:999 1 380px;min-width:0;display:flex;flex-direction:column;gap:6px"><h2 style="font-size:28px">' + esc(s.title) + '</h2><span style="font-size:17px">' + esc(it[1]) + '</span>' +
-          '<span style="font-size:14px;font-weight:600;color:var(--muted)">' + esc(s.by) + ' · ' + esc(s.evShort) + '</span></div>' +
+        return '<section class="box" style="flex-direction:row;flex-wrap:wrap;align-items:center;gap:18px;padding:20px;border-radius:24px"><span class="num" style="width:50px;height:50px;background:var(--yellow)">' + (i + 1) + '</span>' +
+          '<div style="flex:999 1 380px;min-width:0;display:flex;flex-direction:column;gap:6px"><h2 style="font-size:21px">' + esc(s.title) + '</h2><span style="font-size:16px">' + esc(it[1]) + '</span>' +
+          '<span style="font-size:13px;font-weight:600;color:var(--muted)">' + esc(s.by) + ' · ' + esc(s.evShort) + '</span></div>' +
           '<a class="btn pink" style="flex:1 1 150px;max-width:200px" href="#/skill/' + esc(s.id) + '">לעמוד הסקיל</a></section>';
       }).join('') +
-      '<section class="box" style="background:var(--red);padding:26px"><strong style="font-family:var(--head);font-weight:400;font-size:26px">מה לא צריך</strong><span style="font-size:17px;line-height:1.6">' + esc(g.skip) + '</span></section>' +
-      '<a class="btn shadow" style="align-self:flex-start;min-height:56px" href="#/build">העבודה שלך שונה? <strong style="font-family:var(--head);font-weight:400">בנו סט משלכם</strong></a></article></div>';
+      '<section class="box" style="background:var(--red);padding:26px"><strong style="font-family:var(--head);font-weight:400;font-size:20px">מה לא צריך</strong><span style="font-size:16px;line-height:1.6">' + esc(g.skip) + '</span></section>' +
+      '<a class="btn shadow" style="align-self:flex-start;min-height:44px" href="#/build">העבודה שלך שונה? <strong style="font-family:var(--head);font-weight:400">בנו סט משלכם</strong></a></article></div>';
   }
 
 
@@ -393,13 +393,13 @@
     return '<div class="wrap page" style="max-width:1160px"><section class="page-head in"><h1>סקילים לסטודנטים</h1>' +
       '<p class="lead" style="max-width:780px">גם לעבודות ולפרויקטים שצריך להגיש, וגם ללמידה עצמה. בחרו את התחום שלכם, וקחו רק את מה שמתאים לקורס שאתם בו עכשיו.</p>' +
       '<div class="row-chips">' + FIELDS.map(function (f) { return '<a class="chip" style="display:inline-flex;align-items:center;text-decoration:none;background:' + f[2] + '" href="#/students/' + f[0] + '">' + f[1] + '</a>'; }).join('') + '</div></section>' +
-      '<section class="box" style="background:var(--ink);color:#fff;border-color:var(--ink)"><strong style="font-family:var(--head);font-weight:400;font-size:26px;color:var(--yellow)">ללמוד, לא להעתיק</strong>' +
-      '<span style="font-size:17px">הסקילים כאן עוזרים להבין, לתרגל ולעבוד נכון עם נתונים ומקורות. הם לא כותבים את העבודה במקומכם. ובדקו תמיד מה המדיניות בקורס לגבי שימוש ב־AI.</span></section>' +
+      '<section class="box" style="background:var(--ink);color:#fff;border-color:var(--ink)"><strong style="font-family:var(--head);font-weight:400;font-size:20px;color:var(--yellow)">ללמוד, לא להעתיק</strong>' +
+      '<span style="font-size:16px">הסקילים כאן עוזרים להבין, לתרגל ולעבוד נכון עם נתונים ומקורות. הם לא כותבים את העבודה במקומכם. ובדקו תמיד מה המדיניות בקורס לגבי שימוש ב־AI.</span></section>' +
       FIELDS.map(function (f) {
         var list = S.filter(function (s) { return (s.fields || []).indexOf(f[0]) !== -1; });
         if (!list.length) return '';
-        return '<section id="' + f[0] + '" style="display:flex;flex-direction:column;gap:16px;scroll-margin-top:20px"><div class="sec-head"><h2>' + f[1] + '</h2><span style="font-size:16px;font-weight:700">' + list.length + ' סקילים</span></div>' +
-          '<p style="font-size:18px">' + f[3] + '</p><div class="grid">' + list.map(card).join('') + '</div></section>';
+        return '<section id="' + f[0] + '" style="display:flex;flex-direction:column;gap:16px;scroll-margin-top:20px"><div class="sec-head"><h2>' + f[1] + '</h2><span style="font-size:15px;font-weight:700">' + list.length + ' סקילים</span></div>' +
+          '<p style="font-size:16px">' + f[3] + '</p><div class="grid">' + list.map(card).join('') + '</div></section>';
       }).join('') +
       '<section class="box" style="background:var(--red)"><h2>מה לא מצאנו</h2><ul><li>בפסיכולוגיה אין עדיין סקיל טוב ל־SPSS או ל־jamovi, ואין סקיל ייעודי לעיצוב לפי APA. הסקילים כאן הם סקילים כלליים של שיטות מחקר.</li><li>ל־LaTeX אין עדיין סקיל ייעודי חזק. בינתיים יש תבניות לכתיבת מאמרים.</li><li>חלק מסקילי ההנדסה והכלכלה דורשים תוכנה בתשלום, כמו MATLAB ו־Stata. זה כתוב בכל עמוד.</li></ul></section></div>';
   }
@@ -527,35 +527,35 @@
         return '<button type="button" role="tab" class="mtab" data-act="mfam" data-v="' + m.id + '" aria-selected="' + (m.id === f.id) + '"><span class="mdot" style="background:' + m.color + '"></span>' + esc(m.name) + '</button>'; }).join('') + '</div>' +
       modelPanel(f) +
       '<section class="less"><h2>ואיך זה קשור לסקילים?</h2><div class="cols">' +
-      '<div><strong>האפליקציה טוענת, המודל קורא</strong><span style="font-size:17px">סקיל הוא הוראות כתובות. האפליקציה (Claude, ChatGPT, Cursor) טוענת אותו, והמודל קורא ומבצע. לכן קודם בודקים שהאפליקציה תומכת בסקילים.</span></div>' +
-      '<div><strong>סקיל טוב שווה הרבה</strong><span style="font-size:17px">במבחן SkillsBench, סקילים העלו את ההצלחה בכ־14.5 נקודות בממוצע. במחקר, מודל קטן עם סקילים עקף מודל גדול בלי סקילים.</span></div>' +
-      '<div style="background:var(--pink)"><strong>אבל לא קסם</strong><span style="font-size:17px">בחלק מהמשימות סקילים הזיקו. 2–3 סקילים קצרים וממוקדים עובדים טוב יותר מהרבה סקילים ארוכים.</span></div></div>' +
+      '<div><strong>האפליקציה טוענת, המודל קורא</strong><span style="font-size:16px">סקיל הוא הוראות כתובות. האפליקציה (Claude, ChatGPT, Cursor) טוענת אותו, והמודל קורא ומבצע. לכן קודם בודקים שהאפליקציה תומכת בסקילים.</span></div>' +
+      '<div><strong>סקיל טוב שווה הרבה</strong><span style="font-size:16px">במבחן SkillsBench, סקילים העלו את ההצלחה בכ־14.5 נקודות בממוצע. במחקר, מודל קטן עם סקילים עקף מודל גדול בלי סקילים.</span></div>' +
+      '<div style="background:var(--pink)"><strong>אבל לא קסם</strong><span style="font-size:16px">בחלק מהמשימות סקילים הזיקו. 2–3 סקילים קצרים וממוקדים עובדים טוב יותר מהרבה סקילים ארוכים.</span></div></div>' +
       '<p class="note" style="color:#ddd">מקורות: <a style="color:var(--yellow)" href="https://vals.ai/benchmarks/skillsbench" target="_blank" rel="noopener">Vals AI, SkillsBench</a> (עודכן 27.09.2026) · <a style="color:var(--yellow)" href="https://arxiv.org/html/2602.12670v1" target="_blank" rel="noopener">המאמר של SkillsBench</a> · <a style="color:var(--yellow)" href="https://evaluatingevals.substack.com/p/skillsbench-review" target="_blank" rel="noopener">ביקורת עצמאית על המבחן</a></p></section></div>';
   }
 
   /* ---------- updates & legal ---------- */
   function updates() {
-    return '<div class="wrap page" style="max-width:1000px"><section class="page-head in"><h1>מה חדש בעולם הסקילים</h1><p class="lead">מה נמדד, ממה להיזהר, ואיך להשתמש בסקילים נכון.</p><span class="dark-tag" style="align-self:flex-start;padding:5px 14px;font-size:15px">אוקטובר 2026</span></section>' +
-      '<article class="box shadow"><h2>מה נמדד</h2><p style="font-size:18px;line-height:1.7">בטבלת הדירוג של SkillsBench, 34 מודלים נבדקו על אותן משימות, פעם בלי סקילים ופעם איתם. בממוצע, שיעור ההצלחה עלה מ־36% ל־51%.</p><p style="font-size:18px;line-height:1.7">שימו לב: המדידה היא על משימות, לא על סקיל מסוים.</p><span class="note" style="font-weight:600">מקור: Vals AI, טבלת SkillsBench · עודכן 27.09.2026</span></article>' +
-      '<article class="box" style="background:var(--red)"><h2>מתי לבדוק פעמיים לפני התקנה</h2><ul><li>יש שני סקילים עם אותו שם, ממפרסמים שונים.</li><li>הרבה התקנות, אבל כמעט אין פעילות בריפו.</li><li>הסקיל מבקש גישה רחבה בלי סיבה ברורה.</li></ul><p style="font-size:18px;line-height:1.7">במקרה כזה, העדיפו את המקור המקורי ובדקו מי המפרסם.</p></article>' +
-      '<article class="box shadow"><h2>למה לא להוריד חבילה שלמה</h2><p style="font-size:18px;line-height:1.7">חבילות גדולות כוללות הרבה סקילים חופפים. כשיש כמה סקילים לאותה משימה, ה־AI עלול לבחור את הלא נכון, וכל סקיל מותקן תופס מקום גם כשלא משתמשים בו.</p><p style="font-size:18px;line-height:1.7">העיקרון פשוט: מתקינים רק את מה שמתאים לעבודה שלך, ומוסיפים עוד כשיש צורך.</p></article>' +
-      '<article class="box" style="background:var(--blue)"><h2>טיפ</h2><p style="font-size:18px;line-height:1.7">רוב הטוקנים הולכים על מה שה־AI קורא, לא על מה שהוא כותב. סקיל שמסנן את מה שנכנס לשיחה חוסך בדרך כלל יותר מסקיל שמקצר תשובות.</p></article></div>';
+    return '<div class="wrap page" style="max-width:1000px"><section class="page-head in"><h1>מה חדש בעולם הסקילים</h1><p class="lead">מה נמדד, ממה להיזהר, ואיך להשתמש בסקילים נכון.</p><span class="dark-tag" style="align-self:flex-start;padding:5px 14px;font-size:14px">אוקטובר 2026</span></section>' +
+      '<article class="box shadow"><h2>מה נמדד</h2><p style="font-size:16px;line-height:1.7">בטבלת הדירוג של SkillsBench, 34 מודלים נבדקו על אותן משימות, פעם בלי סקילים ופעם איתם. בממוצע, שיעור ההצלחה עלה מ־36% ל־51%.</p><p style="font-size:16px;line-height:1.7">שימו לב: המדידה היא על משימות, לא על סקיל מסוים.</p><span class="note" style="font-weight:600">מקור: Vals AI, טבלת SkillsBench · עודכן 27.09.2026</span></article>' +
+      '<article class="box" style="background:var(--red)"><h2>מתי לבדוק פעמיים לפני התקנה</h2><ul><li>יש שני סקילים עם אותו שם, ממפרסמים שונים.</li><li>הרבה התקנות, אבל כמעט אין פעילות בריפו.</li><li>הסקיל מבקש גישה רחבה בלי סיבה ברורה.</li></ul><p style="font-size:16px;line-height:1.7">במקרה כזה, העדיפו את המקור המקורי ובדקו מי המפרסם.</p></article>' +
+      '<article class="box shadow"><h2>למה לא להוריד חבילה שלמה</h2><p style="font-size:16px;line-height:1.7">חבילות גדולות כוללות הרבה סקילים חופפים. כשיש כמה סקילים לאותה משימה, ה־AI עלול לבחור את הלא נכון, וכל סקיל מותקן תופס מקום גם כשלא משתמשים בו.</p><p style="font-size:16px;line-height:1.7">העיקרון פשוט: מתקינים רק את מה שמתאים לעבודה שלך, ומוסיפים עוד כשיש צורך.</p></article>' +
+      '<article class="box" style="background:var(--blue)"><h2>טיפ</h2><p style="font-size:16px;line-height:1.7">רוב הטוקנים הולכים על מה שה־AI קורא, לא על מה שהוא כותב. סקיל שמסנן את מה שנכנס לשיחה חוסך בדרך כלל יותר מסקיל שמקצר תשובות.</p></article></div>';
   }
   function legal() {
     return '<div class="wrap page" style="max-width:1000px;gap:28px"><section class="page-head in"><h1>מידע משפטי</h1><span class="tag" style="align-self:flex-start;background:var(--pink)">טיוטה לבדיקת עורך דין</span></section>' +
-      '<article id="terms" class="box shadow"><h2>תנאי שימוש</h2><ul style="font-size:17px"><li>SkillForYou הוא מדריך מידע. הוא לא מפתח, לא מארח ולא בודק את הקוד של הסקילים.</li><li>כל סקיל מותקן ישירות מהמקור של היוצר, ובאחריות המשתמש.</li><li>המידע מבוסס על מקורות ציבוריים ועשוי להשתנות. כל מידע שלא נבדק מסומן ככזה.</li><li>אין באתר ייעוץ משפטי, פיננסי או מקצועי, גם כשמוצגים סקילים בתחומים האלה.</li></ul></article>' +
-      '<article id="privacy" class="box"><h2>מדיניות פרטיות</h2><ul style="font-size:17px"><li>אין באתר הרשמה, חשבונות או רשימת תפוצה.</li><li>האתר משתמש ב־Cloudflare Web Analytics כדי לספור כניסות לעמודים. הכלי לא משתמש בעוגיות, לא שומר מידע בדפדפן ולא עוקב אחרי גולשים בין אתרים. נשמרים רק נתונים מצטברים, כמו מספר כניסות, מדינה, סוג מכשיר ודפדפן.</li><li>בטופס הדיווח, כתובת המייל היא רשות, ומשמשת רק לחזרה אליך.</li><li>לשאלות על המידע שלך: [כתובת מייל ליצירת קשר].</li></ul></article>' +
-      '<article id="a11y" class="box"><h2>הצהרת נגישות</h2><p style="font-size:17px;line-height:1.7">האתר נבנה לפי התקן הישראלי 5568, ברמת AA. אפשר לנווט בכל האתר עם המקלדת, הטקסט עומד ביחסי ניגודיות מומלצים, ומי שהגדיר במכשיר הפחתת תנועה יקבל את האתר בלי הנפשות.</p><p style="font-size:17px;line-height:1.7">נתקלת בבעיית נגישות? אפשר לפנות אל [שם רכז/ת הנגישות], בטלפון [מספר] או במייל [כתובת].</p><span class="note" style="font-weight:600">ההצהרה עודכנה: [תאריך הבדיקה האחרונה]</span></article>' +
-      '<article id="report" class="box" style="background:var(--green)"><h2>דיווח או בקשת עדכון</h2><p style="font-size:17px">יש טעות במידע על סקיל? אתה היוצר ורוצה לעדכן או להסיר אותו? ספר לנו, ונבדוק.</p>' +
+      '<article id="terms" class="box shadow"><h2>תנאי שימוש</h2><ul style="font-size:16px"><li>SkillForYou הוא מדריך מידע. הוא לא מפתח, לא מארח ולא בודק את הקוד של הסקילים.</li><li>כל סקיל מותקן ישירות מהמקור של היוצר, ובאחריות המשתמש.</li><li>המידע מבוסס על מקורות ציבוריים ועשוי להשתנות. כל מידע שלא נבדק מסומן ככזה.</li><li>אין באתר ייעוץ משפטי, פיננסי או מקצועי, גם כשמוצגים סקילים בתחומים האלה.</li></ul></article>' +
+      '<article id="privacy" class="box"><h2>מדיניות פרטיות</h2><ul style="font-size:16px"><li>אין באתר הרשמה, חשבונות או רשימת תפוצה.</li><li>האתר משתמש ב־Cloudflare Web Analytics כדי לספור כניסות לעמודים. הכלי לא משתמש בעוגיות, לא שומר מידע בדפדפן ולא עוקב אחרי גולשים בין אתרים. נשמרים רק נתונים מצטברים, כמו מספר כניסות, מדינה, סוג מכשיר ודפדפן.</li><li>בטופס הדיווח, כתובת המייל היא רשות, ומשמשת רק לחזרה אליך.</li><li>לשאלות על המידע שלך: [כתובת מייל ליצירת קשר].</li></ul></article>' +
+      '<article id="a11y" class="box"><h2>הצהרת נגישות</h2><p style="font-size:16px;line-height:1.7">האתר נבנה לפי התקן הישראלי 5568, ברמת AA. אפשר לנווט בכל האתר עם המקלדת, הטקסט עומד ביחסי ניגודיות מומלצים, ומי שהגדיר במכשיר הפחתת תנועה יקבל את האתר בלי הנפשות.</p><p style="font-size:16px;line-height:1.7">נתקלת בבעיית נגישות? אפשר לפנות אל [שם רכז/ת הנגישות], בטלפון [מספר] או במייל [כתובת].</p><span class="note" style="font-weight:600">ההצהרה עודכנה: [תאריך הבדיקה האחרונה]</span></article>' +
+      '<article id="report" class="box" style="background:var(--green)"><h2>דיווח או בקשת עדכון</h2><p style="font-size:16px">יש טעות במידע על סקיל? אתה היוצר ורוצה לעדכן או להסיר אותו? ספר לנו, ונבדוק.</p>' +
       '<form class="req" data-type="report" style="display:flex;flex-direction:column;gap:14px"><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><label class="field">על איזה סקיל מדובר<input name="skill" type="text" placeholder="שם הסקיל או קישור"></label>' +
-      '<fieldset style="margin:0;padding:0;border:0;display:flex;flex-wrap:wrap;gap:10px"><legend style="padding:0;margin-bottom:8px;font-size:16px;font-weight:700">מה תרצה</legend>' +
+      '<fieldset style="margin:0;padding:0;border:0;display:flex;flex-wrap:wrap;gap:10px"><legend style="padding:0;margin-bottom:8px;font-size:15px;font-weight:700">מה תרצה</legend>' +
       ['לתקן מידע', 'אני היוצר, רוצה להסיר', 'בעיית אבטחה'].map(function (k) {
-        return '<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;background:#fff;border:2px solid var(--ink);border-radius:999px;font-size:16px;cursor:pointer"><input type="radio" name="kind" value="' + k + '" style="width:18px;height:18px;margin:0;accent-color:#141414">' + k + '</label>'; }).join('') + '</fieldset>' +
+        return '<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;background:#fff;border:2px solid var(--ink);border-radius:999px;font-size:15px;cursor:pointer"><input type="radio" name="kind" value="' + k + '" style="width:18px;height:18px;margin:0;accent-color:#141414">' + k + '</label>'; }).join('') + '</fieldset>' +
       '<label class="field">פרטים<textarea name="details" rows="4"></textarea></label><label class="field">מייל לחזרה (רשות)<input name="email" type="email" dir="ltr" placeholder="your@email.com" style="text-align:right"></label>' +
       '<button type="submit" class="btn pink head shadow" style="align-self:flex-start">שליחה</button></form></article></div>';
   }
   function notFound() {
-    return '<div class="wrap page"><section class="box shadow in" style="align-items:flex-start"><h1 style="font-size:44px">לא מצאנו את העמוד הזה</h1><a class="btn yellow" href="#/">לקטלוג</a></section></div>';
+    return '<div class="wrap page"><section class="box shadow in" style="align-items:flex-start"><h1 style="font-size:var(--h1)">לא מצאנו את העמוד הזה</h1><a class="btn yellow" href="#/">לקטלוג</a></section></div>';
   }
 
   /* ---------- router ---------- */
@@ -568,7 +568,7 @@
     else if (parts[0] === 'skill') {
       var s = byId[decodeURIComponent(parts[1] || '')];
       if (s && !s._loaded) {
-        html = '<div class="wrap page"><p class="note" style="font-size:17px">טוען…</p></div>';
+        html = '<div class="wrap page"><p class="note" style="font-size:16px">טוען…</p></div>';
         fetch('data/d/' + encodeURIComponent(s.id) + '.json?v=' + (window.SF_V || '')).then(function (r) { return r.ok ? r.json() : {}; }, function () { return {}; })
           .then(function (d) { Object.assign(s, d); s._loaded = true; if ((location.hash || '').indexOf('#/skill/' + s.id) === 0) route(true); });
       } else html = skillPage(s);
