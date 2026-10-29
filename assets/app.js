@@ -73,18 +73,50 @@
   var mark = function (d) { return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"></path></svg>'; };
 
   var S = [], byId = {}, byKey = {}, byOv = {};
-  var st = { mfam: 'claude', q: '', need: 'all', level: 'everyday', shown: 24, bq: '', built: '', tool: '', install: false, adv: false };
+  var st = { mfam: 'claude', q: '', need: 'all', sort: 'rec', fam: 'all', anyTool: false, level: 'everyday', shown: 24, bq: '', built: '', tool: '', install: false, adv: false };
 
   /* ---------- search ---------- */
   var engine = null;
+  // which AI tool families a skill says it works with (from its own documentation)
+  var FAMS = [
+    { id: 'all', label: 'כל הכלים', color: '#fff' },
+    { id: 'claude', label: 'Claude', color: '#FFB86B', re: /claude|cowork/i },
+    { id: 'openai', label: 'ChatGPT / Codex', color: '#9BE38A', re: /codex|chatgpt|openai/i },
+    { id: 'gemini', label: 'Gemini', color: '#7CD8FF', re: /gemini|antigravity/i },
+    { id: 'cursor', label: 'Cursor', color: '#D7B8FF', re: /cursor/i },
+    { id: 'copilot', label: 'Copilot', color: '#FFC2D1', re: /copilot|vs ?code/i }
+  ];
+  var SORTS = [
+    { id: 'rec', label: 'מומלץ', color: '#fff' },
+    { id: 'pop', label: 'הכי פופולרי', color: '#fff' },
+    { id: 'need', label: 'לפי צורך', color: '#fff' },
+    { id: 'new', label: 'עודכן לאחרונה', color: '#fff' }
+  ];
+  function famsOf(s) {
+    var stated = (s.works || []).concat(s.ft || []);
+    if (stated.some(function (w) { return /any agent skills/i.test(w); })) return 'any';
+    var out = {}; FAMS.forEach(function (f) { if (f.re && stated.some(function (w) { return f.re.test(w); })) out[f.id] = 1; });
+    return stated.length ? out : null;
+  }
+  function popScore(s) { return (s.installs || 0) * 10 + (s.stars || 0); }
+  function needFilter(s) { return st.need === 'all' || s.need === st.need; }
+  function famOk(s) {
+    if (st.fam === 'all' || s._fam === 'any') return true;
+    if (!s._fam) return st.anyTool;
+    return !!s._fam[st.fam];
+  }
   function filtered() {
-    var q = st.q.trim();
-    if (q && engine) {
-      return engine.search(q).map(function (r) { return S[r.idx]; }).filter(function (s) {
-        return st.need === 'all' || s.need === st.need;
-      });
-    }
-    return S.filter(function (s) { return st.need === 'all' || s.need === st.need; });
+    var q = st.q.trim(), base;
+    if (q && engine) base = engine.search(q).map(function (r) { return S[r.idx]; }).filter(needFilter);
+    else base = S.filter(needFilter);
+    var list = base.filter(famOk);
+    list.unstated = st.fam !== 'all' && !st.anyTool ? base.filter(function (s) { return !s._fam; }).length : 0;
+    var order = {}; NEEDS.forEach(function (n, i) { order[n.id] = i; });
+    var idx = {}; list.forEach(function (s, i) { idx[s.id] = i; });
+    if (st.sort === 'pop') list.sort(function (a, b) { return popScore(b) - popScore(a) || idx[a.id] - idx[b.id]; });
+    else if (st.sort === 'need') list.sort(function (a, b) { return (order[a.need] - order[b.need]) || popScore(b) - popScore(a); });
+    else if (st.sort === 'new') list.sort(function (a, b) { return String(b.updated || '').localeCompare(String(a.updated || '')) || idx[a.id] - idx[b.id]; });
+    return list;
   }
   var SITE = 'https://skillforyou.pages.dev/';
   function askAI(text, tool) {
@@ -128,9 +160,22 @@
     var list = filtered();
     var q = st.q.trim();
     var heading = q ? 'תוצאות עבור ״' + q + '״' : st.need !== 'all' ? 'סקילים ל' + C[st.need].label : 'כל הסקילים';
+    var sorts = SORTS.map(function (x) { return x.id === 'rec' && q ? { id: 'rec', label: 'הכי מתאים', color: '#fff' } : x; });
+    var shown = list.slice(0, st.shown), grid;
+    if (st.sort === 'need' && st.need === 'all') {
+      var groups = [];
+      shown.forEach(function (s) { var g = groups[groups.length - 1]; if (!g || g.need !== s.need) groups.push(g = { need: s.need, items: [] }); g.items.push(s); });
+      grid = groups.map(function (g) {
+        return '<h3 style="font-family:var(--head);font-weight:400;font-size:26px;margin-top:8px"><span class="tag" style="background:' + C[g.need].color + ';font-size:inherit;font-family:inherit">' + esc(C[g.need].label) + '</span></h3><div class="grid">' + g.items.map(card).join('') + '</div>';
+      }).join('');
+    } else grid = '<div class="grid">' + shown.map(card).join('') + '</div>';
     return '<div class="sec-head"><h2>' + esc(heading) + '</h2><span style="font-size:16px;font-weight:700" aria-live="polite">' + list.length + ' סקילים</span></div>' +
       '<div class="row-chips" role="group" aria-label="סינון לפי צורך">' + chips(NEEDS, 'need', st.need) + '</div>' +
-      (list.length ? '<div class="grid">' + list.slice(0, st.shown).map(card).join('') + '</div>' +
+      '<div class="row-chips" role="group" aria-label="סינון לפי כלי AI"><span style="font-size:16px;font-weight:700">עובד עם:</span>' + chips(FAMS, 'fam', st.fam) + '</div>' +
+      '<div class="row-chips" role="group" aria-label="מיון"><span style="font-size:16px;font-weight:700">מיון:</span>' + chips(sorts, 'sort', st.sort) + '</div>' +
+      (list.unstated ? '<p class="note" style="font-size:15px">עוד ' + list.unstated + ' סקילים לא מציינים בתיעוד עם אילו כלים הם עובדים. הפורמט פתוח, אז רובם יעבדו גם ב־' + esc(FAMS.filter(function (f) { return f.id === st.fam; })[0].label) + '. <button type="button" class="linkbtn" data-act="anytool" style="font:inherit;font-weight:800;text-decoration:underline;background:none;border:0;cursor:pointer;padding:0">להציג גם אותם</button></p>' : '') +
+      (st.sort === 'pop' ? '<p class="note" style="font-size:15px">לפי מספר ההתקנות ב־skills.sh, ואחריו לפי הכוכבים בגיטהאב.</p>' : '') +
+      (list.length ? grid +
         (list.length > st.shown ? '<button type="button" class="btn shadow more" data-act="more">להציג עוד (' + (list.length - st.shown) + ')</button>' : '')
         : requestBox(q) + (q ? askAI(q, '') : ''));
   }
@@ -555,6 +600,9 @@
     var b = e.target.closest('[data-act]'); if (!b) return;
     var v = b.getAttribute('data-v'), act = b.getAttribute('data-act');
     if (act === 'need') { st.need = v; st.shown = 24; if (v === 'all') { st.q = ''; var qi = $('#q'); if (qi) qi.value = ''; } refreshCatalog(); }
+    else if (act === 'fam') { st.fam = v; st.anyTool = false; st.shown = 24; refreshCatalog(); }
+    else if (act === 'sort') { st.sort = v; st.shown = 24; refreshCatalog(); }
+    else if (act === 'anytool') { st.anyTool = true; refreshCatalog(); }
     else if (act === 'more') { st.shown += 48; refreshCatalog(); }
     else if (act === 'try') { st.q = v; st.need = 'all'; st.shown = 24; $('#q').value = v; refreshCatalog(); document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' }); }
     else if (act === 'clear') { st.q = ''; st.need = 'all'; var q = $('#q'); if (q) q.value = ''; refreshCatalog(); }
@@ -627,6 +675,7 @@
     S.forEach(function (s) {
       byId[s.id] = s; if (s.key) byKey[s.key] = s;
       if (s.ov) (byOv[s.ov] = byOv[s.ov] || []).push(s);
+      s._fam = famsOf(s);
       s._text = [s.title, s.what, s.ask, s.name, s.repo, s.job, s.desc, C[s.need] && C[s.need].label].join(' ').toLowerCase().replace(/[״"׳']/g, '');
     });
     S.sort(function (a, b) { return (a.level === 'everyday' ? 0 : 1) - (b.level === 'everyday' ? 0 : 1); });
