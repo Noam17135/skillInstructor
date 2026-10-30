@@ -1,0 +1,51 @@
+name: Site check
+# Opens every kind of page on phone, tablet and desktop and reports bugs.
+# On failure it opens (or updates) a GitHub issue, which sends an email to the repo owner.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '41 5 * * 1'   # every Monday 05:41 UTC
+  workflow_run:
+    workflows: [Weekly refresh]
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: qa
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install browser
+        run: |
+          npm install --no-save --no-package-lock playwright@1.48.2
+          npx playwright install --with-deps chromium
+      - name: Check the site
+        id: qa
+        run: node scripts/qa.cjs
+        continue-on-error: true
+      - name: Report
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OUTCOME: ${{ steps.qa.outcome }}
+        run: |
+          TITLE="בדיקת אתר: נמצאו בעיות"
+          cat qa-report.md >> "$GITHUB_STEP_SUMMARY" || true
+          NUM=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number --jq '.[0].number' || true)
+          if [ "$OUTCOME" = "success" ]; then
+            if [ -n "$NUM" ]; then gh issue close "$NUM" --comment "הבדיקה האחרונה עברה בלי שגיאות."; fi
+            exit 0
+          fi
+          if [ ! -f qa-report.md ]; then echo "The check crashed before writing a report" > qa-report.md; fi
+          if [ -n "$NUM" ]; then gh issue comment "$NUM" --body-file qa-report.md
+          else gh issue create --title "$TITLE" --body-file qa-report.md; fi
+          exit 1

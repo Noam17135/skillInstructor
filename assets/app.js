@@ -172,7 +172,7 @@
     } else grid = '<div class="grid">' + shown.map(card).join('') + '</div>';
     return '<div class="sec-head"><h2>' + esc(heading) + '</h2><span style="font-size:15px;font-weight:700" aria-live="polite">' + list.length + ' סקילים</span></div>' +
       filterBlock(sorts, list.length) +
-      (list.unstated ? '<p class="note" style="font-size:14px">עוד ' + list.unstated + ' סקילים לא מציינים בתיעוד עם אילו כלים הם עובדים. הפורמט פתוח, אז רובם יעבדו גם ב־' + esc(FAMS.filter(function (f) { return f.id === st.fam; })[0].label) + '. <button type="button" class="linkbtn" data-act="anytool" style="font:inherit;font-weight:800;text-decoration:underline;background:none;border:0;cursor:pointer;padding:0">להציג גם אותם</button></p>' : '') +
+      (list.unstated ? '<p class="note" style="font-size:14px">עוד ' + list.unstated + ' סקילים לא מציינים בתיעוד עם אילו כלים הם עובדים. הפורמט פתוח, אז רובם יעבדו גם ב־' + esc(FAMS.filter(function (f) { return f.id === st.fam; })[0].label) + '. <button type="button" class="linkbtn" data-act="anytool" style="font:inherit;font-weight:800;text-decoration:underline;background:none;border:0;cursor:pointer;padding:0 2px;min-height:28px;display:inline-flex;align-items:center">להציג גם אותם</button></p>' : '') +
       (st.sort === 'pop' ? '<p class="note" style="font-size:14px">לפי מספר ההתקנות ב־skills.sh, ואחריו לפי הכוכבים בגיטהאב.</p>' : '') +
       (list.length ? grid +
         (list.length > st.shown ? '<button type="button" class="btn shadow more" data-act="more">להציג עוד (' + (list.length - st.shown) + ')</button>' : '')
@@ -586,7 +586,7 @@
       if (s && !s._loaded) {
         html = '<div class="wrap page"><p class="note" style="font-size:16px">טוען…</p></div>';
         fetch('data/d/' + encodeURIComponent(s.id) + '.json?v=' + (window.SF_V || '')).then(function (r) { return r.ok ? r.json() : {}; }, function () { return {}; })
-          .then(function (d) { Object.assign(s, d); s._loaded = true; if ((location.hash || '').indexOf('#/skill/' + s.id) === 0) route(true); });
+          .then(function (d) { ['nots', 'does', 'how', 'examples', 'good', 'bad', 'pairs'].forEach(function (k) { if (typeof d[k] === 'string') d[k] = [d[k]]; }); Object.assign(s, d); s._loaded = true; if ((location.hash || '').indexOf('#/skill/' + s.id) === 0) route(true); });
       } else html = skillPage(s);
       if (s) title = s.title + ' · SkillForYou';
     }
