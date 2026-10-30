@@ -229,7 +229,9 @@ body.lock{overflow:hidden}
 
 @media (max-width:700px){
   /* header: logo + hamburger, menu drops down */
-  .top{flex-wrap:wrap;position:relative}
+  .top{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;position:relative}
+  .top .menubtn{grid-column:1;grid-row:1}
+  .top .logo{grid-column:2;grid-row:1;justify-self:center}
   .menubtn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:var(--b) solid var(--ink);border-radius:12px;background:#fff;box-shadow:2px 2px 0 var(--ink);cursor:pointer}
   .menubtn[aria-expanded="true"]{background:var(--ink);color:#fff}
   .nav{display:none;position:absolute;top:calc(100% - 4px);inset-inline:16px;z-index:50;flex-direction:column;gap:2px;padding:8px;background:#fff;border:var(--b) solid var(--ink);border-radius:16px;box-shadow:5px 5px 0 var(--ink)}
