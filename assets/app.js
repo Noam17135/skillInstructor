@@ -65,6 +65,7 @@
   ];
 
   var ICON = {
+    filter: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',
     back: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>',
     fwd: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>',
     chev: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>',
@@ -73,7 +74,7 @@
   var mark = function (d) { return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"></path></svg>'; };
 
   var S = [], byId = {}, byKey = {}, byOv = {};
-  var st = { mfam: 'claude', q: '', need: 'all', sort: 'rec', fam: 'all', anyTool: false, level: 'everyday', shown: 24, bq: '', built: '', tool: '', install: false, adv: false };
+  var st = { sheet: false, mfam: 'claude', q: '', need: 'all', sort: 'rec', fam: 'all', anyTool: false, level: 'everyday', shown: 24, bq: '', built: '', tool: '', install: false, adv: false };
 
   /* ---------- search ---------- */
   var engine = null;
@@ -170,14 +171,27 @@
       }).join('');
     } else grid = '<div class="grid">' + shown.map(card).join('') + '</div>';
     return '<div class="sec-head"><h2>' + esc(heading) + '</h2><span style="font-size:15px;font-weight:700" aria-live="polite">' + list.length + ' סקילים</span></div>' +
-      '<div class="row-chips scroll" role="group" aria-label="סינון לפי צורך">' + chips(NEEDS, 'need', st.need) + '</div>' +
-      '<div class="row-chips scroll" role="group" aria-label="סינון לפי כלי AI"><span style="font-size:15px;font-weight:700">עובד עם:</span>' + chips(FAMS, 'fam', st.fam) + '</div>' +
-      '<div class="row-chips scroll" role="group" aria-label="מיון"><span style="font-size:15px;font-weight:700">מיון:</span>' + chips(sorts, 'sort', st.sort) + '</div>' +
+      filterBlock(sorts, list.length) +
       (list.unstated ? '<p class="note" style="font-size:14px">עוד ' + list.unstated + ' סקילים לא מציינים בתיעוד עם אילו כלים הם עובדים. הפורמט פתוח, אז רובם יעבדו גם ב־' + esc(FAMS.filter(function (f) { return f.id === st.fam; })[0].label) + '. <button type="button" class="linkbtn" data-act="anytool" style="font:inherit;font-weight:800;text-decoration:underline;background:none;border:0;cursor:pointer;padding:0">להציג גם אותם</button></p>' : '') +
       (st.sort === 'pop' ? '<p class="note" style="font-size:14px">לפי מספר ההתקנות ב־skills.sh, ואחריו לפי הכוכבים בגיטהאב.</p>' : '') +
       (list.length ? grid +
         (list.length > st.shown ? '<button type="button" class="btn shadow more" data-act="more">להציג עוד (' + (list.length - st.shown) + ')</button>' : '')
         : requestBox(q) + (q ? askAI(q, '') : ''));
+  }
+  // filters: inline rows on desktop; on mobile a single button that opens a bottom sheet
+  function filterBlock(sorts, n) {
+    var active = (st.need !== 'all' ? 1 : 0) + (st.fam !== 'all' ? 1 : 0) + (st.sort !== 'rec' ? 1 : 0);
+    var sum = [st.need !== 'all' ? C[st.need].label : '', st.fam !== 'all' ? FAMS.filter(function (f) { return f.id === st.fam; })[0].label : '',
+      st.sort !== 'rec' ? sorts.filter(function (x) { return x.id === st.sort; })[0].label : ''].filter(Boolean).join(' · ');
+    return '<div class="fbar"><button type="button" class="btn shadow" data-act="sheet" aria-expanded="' + st.sheet + '" aria-controls="filters">' + ICON.filter + 'סינון ומיון' + (active ? ' <span class="fcount">' + active + '</span>' : '') + '</button>' +
+      (sum ? '<span class="fsum">' + esc(sum) + '</span>' : '') + '</div>' +
+      '<div class="fbackdrop' + (st.sheet ? ' open' : '') + '" data-act="sheet"></div>' +
+      '<div class="filters' + (st.sheet ? ' open' : '') + '" id="filters" role="group" aria-label="סינון ומיון">' +
+      '<div class="sheet-head"><strong>סינון ומיון</strong><button type="button" class="sheet-x" data-act="sheet" aria-label="סגירה">✕</button></div>' +
+      '<div class="row-chips scroll" role="group" aria-label="סינון לפי צורך"><span class="lbl-m">צורך:</span>' + chips(NEEDS, 'need', st.need) + '</div>' +
+      '<div class="row-chips scroll" role="group" aria-label="סינון לפי כלי AI"><span>עובד עם:</span>' + chips(FAMS, 'fam', st.fam) + '</div>' +
+      '<div class="row-chips scroll" role="group" aria-label="מיון"><span>מיון:</span>' + chips(sorts, 'sort', st.sort) + '</div>' +
+      '<div class="sheet-foot"><button type="button" class="btn" data-act="fclear">ניקוי</button><button type="button" class="btn pink" data-act="sheet">להציג ' + n + ' סקילים</button></div></div>';
   }
   function home() {
     var tries = [['לחבר קבצי PDF', 'PDF'], ['מצגת', 'מצגת'], ['מיילים', 'מייל'], ['הכנה למבחן', 'הכנה למבחן'], ['רגרסיה', 'רגרסיה']];
@@ -559,7 +573,7 @@
   }
 
   /* ---------- router ---------- */
-  var NAV = [['/', 'קטלוג'], ['/build', 'בנו לי סט'], ['/guides', 'מדריכים'], ['/models', 'מודלים'], ['/updates', 'עדכונים']];
+  var NAV = [['/build', 'בנו לי סט'], ['/guides', 'מדריכים'], ['/models', 'מודלים'], ['/updates', 'עדכונים']];
   function route(keepScroll) {
     var path = (location.hash || '#/').slice(1) || '/';
     var parts = path.split('/').filter(Boolean);
@@ -582,6 +596,7 @@
     else if (parts[0] === 'updates') { html = updates(); active = '/updates'; title = 'עדכונים · SkillForYou'; }
     else if (parts[0] === 'legal') { html = legal(); active = ''; title = 'מידע משפטי · SkillForYou'; }
     else html = notFound();
+    closeMenu(); st.sheet = false; document.body.classList.remove('lock');
     $('#nav').innerHTML = NAV.map(function (n) {
       return '<a class="pill" href="#' + n[0] + '"' + (n[0] === active ? ' aria-current="page"' : '') + '>' + n[1] + '</a>';
     }).join('');
@@ -593,6 +608,17 @@
       } else window.scrollTo(0, 0);
     }
   }
+  function closeMenu() { var n = $('#nav'), b = $('#menubtn'); if (n) n.classList.remove('open'); if (b) b.setAttribute('aria-expanded', 'false'); }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('#menubtn');
+    if (b) { var open = !$('#nav').classList.contains('open'); $('#nav').classList.toggle('open', open); b.setAttribute('aria-expanded', String(open)); return; }
+    if (!e.target.closest('.top')) closeMenu();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    closeMenu();
+    if (st.sheet) { st.sheet = false; document.body.classList.remove('lock'); refreshCatalog(); }
+  });
   function rerender() { var y = window.scrollY; route(true); window.scrollTo(0, y); }
 
   /* ---------- events ---------- */
@@ -600,6 +626,8 @@
     var b = e.target.closest('[data-act]'); if (!b) return;
     var v = b.getAttribute('data-v'), act = b.getAttribute('data-act');
     if (act === 'need') { st.need = v; st.shown = 24; if (v === 'all') { st.q = ''; var qi = $('#q'); if (qi) qi.value = ''; } refreshCatalog(); }
+    else if (act === 'sheet') { st.sheet = !st.sheet; document.body.classList.toggle('lock', st.sheet); refreshCatalog(); }
+    else if (act === 'fclear') { st.need = 'all'; st.fam = 'all'; st.sort = 'rec'; st.anyTool = false; st.shown = 24; refreshCatalog(); }
     else if (act === 'fam') { st.fam = v; st.anyTool = false; st.shown = 24; refreshCatalog(); }
     else if (act === 'sort') { st.sort = v; st.shown = 24; refreshCatalog(); }
     else if (act === 'anytool') { st.anyTool = true; refreshCatalog(); }
