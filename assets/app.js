@@ -185,8 +185,8 @@
       st.sort !== 'rec' ? sorts.filter(function (x) { return x.id === st.sort; })[0].label : ''].filter(Boolean).join(' · ');
     return '<div class="fbar"><button type="button" class="btn shadow" data-act="sheet" aria-expanded="' + st.sheet + '" aria-controls="filters">' + ICON.filter + 'סינון ומיון' + (active ? ' <span class="fcount">' + active + '</span>' : '') + '</button>' +
       (sum ? '<span class="fsum">' + esc(sum) + '</span>' : '') + '</div>' +
-      '<div class="fbackdrop' + (st.sheet ? ' open' : '') + '" data-act="sheet"></div>' +
-      '<div class="filters' + (st.sheet ? ' open' : '') + '" id="filters" role="group" aria-label="סינון ומיון">' +
+      '<div class="fbackdrop' + (st.sheet ? ' open' + (st.sheetAnim ? ' anim' : '') : '') + '" data-act="sheet"></div>' +
+      '<div class="filters' + (st.sheet ? ' open' + (st.sheetAnim ? ' anim' : '') : '') + '" id="filters" role="group" aria-label="סינון ומיון">' +
       '<div class="sheet-head"><strong>סינון ומיון</strong><button type="button" class="sheet-x" data-act="sheet" aria-label="סגירה">✕</button></div>' +
       '<div class="row-chips scroll" role="group" aria-label="סינון לפי צורך"><span class="lbl-m">צורך:</span>' + chips(NEEDS, 'need', st.need) + '</div>' +
       '<div class="row-chips scroll" role="group" aria-label="סינון לפי כלי AI"><span>עובד עם:</span>' + chips(FAMS, 'fam', st.fam) + '</div>' +
@@ -628,7 +628,7 @@
     var b = e.target.closest('[data-act]'); if (!b) return;
     var v = b.getAttribute('data-v'), act = b.getAttribute('data-act');
     if (act === 'need') { st.need = v; st.shown = 24; if (v === 'all') { st.q = ''; var qi = $('#q'); if (qi) qi.value = ''; } refreshCatalog(); }
-    else if (act === 'sheet') { st.sheet = !st.sheet; document.body.classList.toggle('lock', st.sheet); refreshCatalog(); }
+    else if (act === 'sheet') { st.sheet = !st.sheet; st.sheetAnim = st.sheet; document.body.classList.toggle('lock', st.sheet); refreshCatalog(); }
     else if (act === 'fclear') { st.need = 'all'; st.fam = 'all'; st.sort = 'rec'; st.anyTool = false; st.shown = 24; refreshCatalog(); }
     else if (act === 'fam') { st.fam = v; st.anyTool = false; st.shown = 24; refreshCatalog(); }
     else if (act === 'sort') { st.sort = v; st.shown = 24; refreshCatalog(); }
@@ -679,7 +679,12 @@
     var k = 'click|' + lastAsk.q.toLowerCase() + '|' + id; if (logged[k]) return; logged[k] = 1;
     logEvent({ kind: 'click', q: lastAsk.q, skill: id });
   }
-  function refreshCatalog() { var c = $('#catalog'); if (c) c.innerHTML = catalogBody(); }
+  function refreshCatalog() {
+    var c = $('#catalog'); if (!c) return;
+    var f = $('#filters'), top = f ? f.scrollTop : 0;
+    c.innerHTML = catalogBody(); st.sheetAnim = false;
+    f = $('#filters'); if (f && top) f.scrollTop = top;
+  }
   var timer, btimer;
   document.addEventListener('input', function (e) {
     if (e.target.id === 'q') { clearTimeout(timer); var v = e.target.value; timer = setTimeout(function () { st.q = v; st.shown = 24; refreshCatalog(); }, 150); clearTimeout(ltimer); ltimer = setTimeout(function () { logAsk('search', v, filtered().length); }, 1500); }

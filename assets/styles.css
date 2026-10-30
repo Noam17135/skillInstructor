@@ -244,7 +244,10 @@ body.lock{overflow:hidden}
   .fbar{display:flex;align-items:center;gap:10px;min-width:0}
   .fbar .btn{flex-shrink:0;min-height:42px;font-size:15px}
   .filters{display:none}
-  .filters.open{display:flex;position:fixed;inset:auto 0 0 0;z-index:60;max-height:85vh;overflow-y:auto;padding:16px 16px calc(16px + env(safe-area-inset-bottom));gap:16px;background:#fff;border-top:var(--b) solid var(--ink);border-radius:20px 20px 0 0;animation:sheet .25s cubic-bezier(.2,.8,.2,1) both}
+  .filters.open{display:flex;position:fixed;inset:auto 0 0 0;z-index:60;max-height:85vh;overflow-y:auto;padding:16px 16px calc(16px + env(safe-area-inset-bottom));gap:16px;background:#fff;border-top:var(--b) solid var(--ink);border-radius:20px 20px 0 0}
+  .filters.open.anim{animation:sheet .25s cubic-bezier(.2,.8,.2,1) both}
+  .fbackdrop.open.anim{animation:fade .2s ease both}
+  .filters .chip{transition:none}
   .fbackdrop.open{display:block;position:fixed;inset:0;z-index:59;background:rgba(20,20,20,.4)}
   .filters .row-chips{flex-wrap:wrap;overflow:visible;margin:0;padding:0}
   .filters .row-chips>span:first-child{width:100%;font-size:14px!important;font-weight:800}
@@ -271,3 +274,4 @@ body.lock{overflow:hidden}
   footer nav{justify-content:center;gap:0 14px}
   footer nav a{min-height:30px;font-size:12.5px}
 }
+@keyframes fade{from{opacity:0}to{opacity:1}}
