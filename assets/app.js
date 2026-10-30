@@ -284,7 +284,7 @@
       '<section class="box sm" style="background:var(--cream);padding:20px 24px"><strong style="font-size:16px">מצאת בעיה בסקיל? אתה היוצר?</strong><a class="btn" style="align-self:flex-start;min-height:40px" href="#/legal/report">לדיווח או לבקשת עדכון</a></section>' +
       '<section class="box sm" style="background:var(--purple)"><h2>מה צריך כדי שיעבוד</h2><span style="font-size:15px">' + esc(s.needs || 'עוד לא בדקנו. הפרטים נמצאים במקור של הסקיל.') + '</span></section>' +
       (overlaps.length ? '<section class="box sm" style="background:#FFF6D1"><h2>חלופות</h2><span style="font-size:15px">הסקילים האלה עושים משימה דומה. בחרו אחד, לפי מה שמתאים לכם.</span>' +
-        (s.choose ? '<div class="alt-row" style="background:#fff;border-style:dashed"><strong style="font-size:14px">הסקיל הזה</strong><span>' + esc(s.choose) + '</span></div>' : '') +
+        (s.choose ? '<div class="alt-row" style="background:var(--cream);border-color:transparent"><strong style="font-size:14px">הסקיל הזה</strong><span>' + esc(s.choose) + '</span></div>' : '') +
         overlaps.map(function (o) { return '<a class="alt-row" href="#/skill/' + esc(o.id) + '"><strong>' + esc(o.title) + '</strong>' + (o.choose ? '<span>' + esc(o.choose) + '</span>' : '<span>' + esc(o.what) + '</span>') + '</a>'; }).join('') + '</section>' : '') +
       (pairs.length ? '<section class="box sm"><h2>משתלב טוב עם</h2>' + pairs.map(function (o) {
         return '<a class="link-row" href="#/skill/' + esc(o.id) + '"><span>' + esc(o.title) + '</span>' + ICON.fwd + '</a>'; }).join('') + '</section>' : '') +
