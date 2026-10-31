@@ -65,6 +65,7 @@
   ];
 
   var ICON = {
+    x: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
     filter: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',
     back: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>',
     fwd: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>',
@@ -199,7 +200,8 @@
       '<section class="hero in"><h1>תן ל־AI<br>כוח־על חדש.</h1>' +
       '<p class="lead">סקיל הוא תוסף קטן שמלמד את ה־AI לעשות משהו אחד ממש טוב. כתוב מה אתה צריך, ונמצא לך את הסקיל המתאים.</p>' +
       '<form class="search" role="search" id="searchform"><label for="q" class="sr">מה אתה רוצה שה־AI יעשה?</label>' +
-      '<input id="q" type="search" autocomplete="off" value="' + esc(st.q) + '" placeholder="מה אתה רוצה שה־AI ידע לעשות?">' +
+      '<span class="qwrap' + (st.q ? ' has' : '') + '"><input id="q" type="search" autocomplete="off" value="' + esc(st.q) + '" placeholder="מה אתה רוצה שה־AI ידע לעשות?">' +
+      '<button type="button" class="qclear" data-act="qclear" aria-label="ניקוי החיפוש">' + ICON.x + '</button></span>' +
       '<button type="submit" class="btn pink big">יאללה</button></form>' +
       '<div class="row-chips"><span>נסו:</span>' + tries.map(function (t) {
         return '<button type="button" class="chip dashed" data-act="try" data-v="' + esc(t[1]) + '">' + esc(t[0]) + '</button>';
@@ -628,6 +630,7 @@
     var b = e.target.closest('[data-act]'); if (!b) return;
     var v = b.getAttribute('data-v'), act = b.getAttribute('data-act');
     if (act === 'need') { st.need = v; st.shown = 24; if (v === 'all') { st.q = ''; var qi = $('#q'); if (qi) qi.value = ''; } refreshCatalog(); }
+    else if (act === 'qclear') { var qi = $('#q'); qi.value = ''; qi.parentNode.classList.remove('has'); clearTimeout(timer); clearTimeout(ltimer); st.q = ''; st.shown = 24; refreshCatalog(); qi.focus(); }
     else if (act === 'sheet') { st.sheet = !st.sheet; st.sheetAnim = st.sheet; document.body.classList.toggle('lock', st.sheet); refreshCatalog(); }
     else if (act === 'fclear') { st.need = 'all'; st.fam = 'all'; st.sort = 'rec'; st.anyTool = false; st.shown = 24; refreshCatalog(); }
     else if (act === 'fam') { st.fam = v; st.anyTool = false; st.shown = 24; refreshCatalog(); }
@@ -687,7 +690,7 @@
   }
   var timer, btimer;
   document.addEventListener('input', function (e) {
-    if (e.target.id === 'q') { clearTimeout(timer); var v = e.target.value; timer = setTimeout(function () { st.q = v; st.shown = 24; refreshCatalog(); }, 150); clearTimeout(ltimer); ltimer = setTimeout(function () { logAsk('search', v, filtered().length); }, 1500); }
+    if (e.target.id === 'q') { clearTimeout(timer); var v = e.target.value; e.target.parentNode.classList.toggle('has', !!v); timer = setTimeout(function () { st.q = v; st.shown = 24; refreshCatalog(); }, 150); clearTimeout(ltimer); ltimer = setTimeout(function () { logAsk('search', v, filtered().length); }, 1500); }
     if (e.target.id === 'bq') { st.bq = e.target.value; clearTimeout(btimer); btimer = setTimeout(function () { var r = $('#results'); if (r) r.innerHTML = buildResults(); }, 280); clearTimeout(ltimer); ltimer = setTimeout(function () { logAsk('build', st.bq, st.lastN); }, 3000); }
   });
   document.addEventListener('submit', function (e) {

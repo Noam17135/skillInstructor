@@ -135,7 +135,10 @@ async function main() {
       if (!n) throw new Error('חיפוש ״מצגת״ לא החזיר תוצאות');
       await page.fill('#q', 'qwzxqwzx'); await page.waitForTimeout(500);
       if (!(await page.$('#catalog form.req'))) throw new Error('חיפוש בלי תוצאות לא מציג את טופס הבקשה');
-      await page.fill('#q', ''); await page.waitForTimeout(400);
+      await page.click('.qclear'); await page.waitForTimeout(400);
+      if ((await page.inputValue('#q')) !== '') throw new Error('כפתור הניקוי לא ריקן את שדה החיפוש');
+      if (await page.isVisible('.qclear')) throw new Error('כפתור הניקוי נשאר גלוי אחרי ניקוי');
+      if (!/כל הסקילים/.test(await page.$eval('#catalog .sec-head h2', (e) => e.textContent))) throw new Error('אחרי ניקוי החיפוש לא חזרו כל הסקילים');
     });
     await flow('סינון ומיון', async () => {
       await go('#/');
