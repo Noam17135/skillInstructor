@@ -300,7 +300,8 @@ body.lock{overflow:hidden}
 .cc-list{background:#fff;border:var(--b) solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);overflow:hidden}
 .cc-row{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:start;padding:14px 18px;border-top:1px solid #ECECEC}
 .cc-row:first-child{border-top:0}
-.cc-row code{justify-self:start;padding:3px 10px;border-radius:8px;background:var(--cream);border:1.5px solid var(--ink);font-family:Consolas,Menlo,monospace;font-size:14px;font-weight:700}
+.cc-row code{justify-self:start;direction:ltr;unicode-bidi:isolate;padding:3px 10px;border-radius:8px;background:var(--cream);border:1.5px solid var(--ink);font-family:Consolas,Menlo,monospace;font-size:14px;font-weight:700}
 .cc-row p{font-size:16px;line-height:1.55}
 .cc-row span{display:block;margin-top:2px;font-size:14px;color:var(--muted)}
 @media (max-width:600px){.cc-row{grid-template-columns:1fr;gap:6px}}
+.cc-row code.ci{display:inline-block;padding:0 4px;background:transparent;border:0;font-size:13px;font-weight:700;direction:ltr;unicode-bidi:isolate;color:var(--ink)}
