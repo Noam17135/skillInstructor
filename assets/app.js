@@ -521,20 +521,26 @@
   var LVL = ['', 'נמוך', 'בינוני', 'גבוה'];
   var SPD = ['', 'איטי', 'בינוני', 'מהיר'];
   function modelPanel(f) {
+    var li = function (x) { return '<li>' + esc(x) + '</li>'; };
     return '<section class="mpanel" id="mpanel" role="tabpanel"><div class="mswap">' +
       '<header class="mhead"><h2>' + esc(f.name) + '</h2><span>' + esc(f.by) + '</span></header>' +
-      '<dl class="mfacts"><div><dt>איפה משתמשים</dt><dd>' + esc(f.where) + '</dd></div><div><dt>סקילים</dt><dd>' + esc(f.skills.replace(/^טוען סקילים: /, '')) + '</dd></div></dl>' +
-      '<div class="mlist">' + f.models.map(function (m, i) {
-        return '<details class="mdl"><summary><span class="mdl-top"><span class="mdl-n" dir="ltr">' + esc(m.n) + '</span><span class="mtag">' + esc(m.tag) + '</span></span>' +
+      '<dl class="mfacts"><div><dt>איפה משתמשים</dt><dd>' + esc(f.where) + '</dd></div><div><dt>סקילים</dt><dd>' + esc(f.skills) + '</dd></div></dl>' +
+      (f.pick ? '<p class="mpick"><strong>בקצרה:</strong> ' + esc(f.pick) + '</p>' : '') +
+      '<div class="mlist">' + f.models.map(function (m) {
+        return '<details class="mdl" id="m-' + esc(m.n.replace(/\W+/g, '-')) + '"><summary><span class="mdl-top"><span class="mdl-n" dir="ltr">' + esc(m.n) + '</span><span class="mtag">' + esc(m.tag) + '</span></span>' +
           '<span class="mdl-for">' + esc(m.for) + '</span>' + ICON.chev + '</summary>' +
           '<div class="mdl-body"><p class="mdl-about">' + esc(m.about) + '</p>' +
-          '<div class="mdl-cols"><div><strong>מתאים ל</strong><ul class="ok">' + m.yes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
-          '<div><strong>מתי לא לבחור בו</strong><ul class="nope">' + m.no.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div></div>' +
+          '<div class="mdl-cols"><div><strong>הכי מתאים ל</strong><ul class="ok">' + m.yes.map(li).join('') + '</ul></div>' +
+          (m.alt && m.alt.length ? '<div><strong>מתי עדיף משהו אחר</strong><ul class="alt">' + m.alt.map(function (a) {
+            return '<li><span>' + esc(a[0]) + '</span> <b dir="auto">← ' + esc(a[1]) + '</b>' + (a[2] ? '<em>' + esc(a[2]) + '</em>' : '') + '</li>'; }).join('') + '</ul></div>' : (m.no && m.no.length ? '<div><strong>מתי עדיף משהו אחר</strong><ul class="nope">' + m.no.map(li).join('') + '</ul></div>' : '')) + '</div>' +
+          (m.access ? '<p class="mdl-acc"><strong>איך משתמשים בו:</strong> ' + esc(m.access) + '</p>' : '') +
           (m.lim && m.lim.length ? '<p class="mdl-lim"><strong>שימו לב:</strong> ' + m.lim.map(esc).join(' ') + '</p>' : '') +
-          '<p class="mdl-meta">מהירות: ' + SPD[m.speed] + ' · מחיר: ' + LVL[m.cost] + '</p></div></details>';
+          '<p class="mdl-meta">מהירות: ' + SPD[m.speed] + ' · מחיר: ' + LVL[m.cost] + (m.api ? ' · ב־API: <span dir="ltr">' + esc(m.api) + '</span>' : '') + '</p></div></details>';
       }).join('') + '</div>' +
+      (f.src && f.src.length ? '<p class="note">מקורות: ' + f.src.map(function (s) { return '<a href="' + esc(s[1]) + '" target="_blank" rel="noopener">' + esc(s[0]) + '</a>'; }).join(' · ') + '</p>' : '') +
       '</div></section>';
   }
+
   function models() {
     var f = MODELS.filter(function (m) { return m.id === st.mfam; })[0] || MODELS[0];
     return '<div class="wrap page" style="max-width:980px"><section class="page-head in"><h1>מודלים, בפשטות</h1>' +
