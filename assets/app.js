@@ -374,7 +374,7 @@
   /* ---------- guides ---------- */
   function guides() {
     return '<div class="wrap narrow page"><section class="page-head in"><h1>מדריכים</h1><p class="lead" style="max-width:720px">מה להתקין לכל סוג עבודה. בכל מדריך 2–3 סקילים בלבד, ולמה דווקא הם.</p></section>' +
-      '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:26px">' + '<a class="card tilt-d" href="#/students" style="background:#C8F7C5;padding:20px;gap:12px"><span class="t" style="font-size:21px">סקילים לסטודנטים</span><span style="font-size:16px">מדעי הנתונים, הנדסה, כלכלה ופסיכולוגיה. לעבודות וללמידה.</span><span style="margin-top:auto;font-size:14px;font-weight:800">לפי תחום · לקריאה</span></a>' + GUIDES.map(function (g, i) {
+      '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:26px">' + '<a class="card tilt-d" href="#/students" style="background:#C8F7C5;padding:20px;gap:12px"><span class="t" style="font-size:21px">סקילים לסטודנטים</span><span style="font-size:16px">מדעי הנתונים, הנדסה, כלכלה ופסיכולוגיה. לעבודות וללמידה.</span><span style="margin-top:auto;font-size:14px;font-weight:800">לפי תחום · לקריאה</span></a>' + '<a class="card tilt-a" href="#/claude-code" style="background:#FFE3C2;padding:20px;gap:12px"><span class="t" style="font-size:21px">פקודות שכדאי להכיר ב־Claude Code</span><span style="font-size:16px">הפקודות המובנות שעוזרות לשמור על סדר בסקילים, בזיכרון ובשיחה.</span><span style="margin-top:auto;font-size:14px;font-weight:800">12 פקודות · לקריאה</span></a>' + GUIDES.map(function (g, i) {
         return '<a class="card ' + TILTS[i % 4] + '" href="#/guide/' + g.id + '" style="background:' + g.color + ';padding:20px;gap:12px"><span class="t" style="font-size:21px">' + esc(g.title) + '</span>' +
           '<span style="font-size:16px">' + esc(g.short) + '</span><span style="margin-top:auto;font-size:14px;font-weight:800">' + g.items.length + ' סקילים · לקריאה</span></a>';
       }).join('') + '</div></div>';
@@ -398,6 +398,42 @@
 
 
 
+
+  /* ---------- Claude Code built-in commands ---------- */
+  var CC = [
+    ['לשמור על סדר בסקילים', [
+      ['/skills', 'רשימת הסקילים שמותקנים אצלך. אפשר למיין לפי כמה מקום כל אחד תופס, ולכבות סקיל בלי למחוק אותו.', 'אחרי שהתקנתם סקיל חדש, או כשיש יותר מדי'],
+      ['/skill-doctor', 'מראה כמה כל סקיל עולה בזיכרון של השיחה וכמה משתמשים בו בפועל, ומסמן סקילים שאף פעם לא הופעלו.', 'כדי להחליט מה לכבות']
+    ]],
+    ['כשמשהו לא עובד', [
+      ['/doctor', 'בדיקה כללית של ההתקנה, ההגדרות, התוספים וקובץ ההוראות. מציעה תיקונים, ולא משנה כלום עד שתאשרו.', 'כשמשהו מתנהג מוזר'],
+      ['/rewind', 'מחזיר את הקוד ואת השיחה לנקודה מוקדמת יותר.', 'כש־Claude הלך לכיוון לא נכון']
+    ]],
+    ['זיכרון ושיחה', [
+      ['/memory', 'פותח את קובצי ההוראות הקבועות (CLAUDE.md): מה ש־Claude זוכר עליכם ועל הפרויקט בין שיחות.', 'כדי לכתוב לו ״תמיד תעשה ככה״, או לבדוק מה הוא שמר'],
+      ['/init', 'יוצר קובץ הוראות ראשוני לפרויקט, מתוך מה שיש בתיקייה.', 'בפעם הראשונה בפרויקט חדש'],
+      ['/clear', 'מתחיל שיחה נקייה. הזיכרון של הפרויקט נשאר.', 'כשעוברים לנושא אחר'],
+      ['/compact', 'מסכם את השיחה כדי לפנות מקום.', 'כששיחה ארוכה מתחילה להיות איטית או ״לשכוח״'],
+      ['/context', 'מראה מה ממלא את הזיכרון של השיחה, כולל סקילים.', 'כשנראה שהשיחה עמוסה'],
+      ['/resume', 'חוזר לשיחה קודמת.', 'כשרוצים להמשיך מאיפה שהפסקתם']
+    ]],
+    ['מודל ומכסה', [
+      ['/model', 'מחליף מודל: Opus למשימה קשה, Haiku כדי לחסוך.', 'כשהמשימה קשה או פשוטה מהרגיל'],
+      ['/usage', 'כמה השתמשתם ומה נשאר מהמכסה.', 'לפני משימה ארוכה']
+    ]]
+  ];
+  function claudeCode() {
+    return '<div class="wrap page" style="max-width:860px"><a class="btn back" href="#/guides">' + ICON.back + 'כל המדריכים</a>' +
+      '<section class="page-head in"><span class="tag" style="align-self:flex-start;background:#FFE3C2" dir="ltr">Claude Code</span><h1>פקודות שכדאי להכיר</h1>' +
+      '<p class="lead">אלה פקודות שכבר מובנות ב־Claude Code, לא סקילים שמתקינים. כותבים אותן בשורת הצ׳אט, מתחילות ב־/.</p></section>' +
+      CC.map(function (g) {
+        return '<section class="cc-group"><h2>' + esc(g[0]) + '</h2><div class="cc-list">' + g[1].map(function (c) {
+          return '<div class="cc-row"><code dir="ltr">' + esc(c[0]) + '</code><div><p>' + esc(c[1]) + '</p><span>מתי: ' + esc(c[2]) + '</span></div></div>';
+        }).join('') + '</div></section>';
+      }).join('') +
+      '<p class="note">חלק מהפקודות תלויות בגרסה ובמסלול, כך שאצלכם התפריט עשוי להיראות קצת אחרת. כדי לראות את כל הפקודות, כותבים / בשורת הצ׳אט. ' +
+      'מקור: <a href="https://code.claude.com/docs/en/commands" target="_blank" rel="noopener">התיעוד של Claude Code</a>.</p></div>';
+  }
   /* ---------- students ---------- */
   var FIELDS = [
     ['general-study', 'לכל סטודנט', '#FFE08A', 'ללמוד, לסכם, להתכונן למבחן ולנהל מקורות.'],
@@ -1218,6 +1254,7 @@
     else if (parts[0] === 'build') { html = build(); active = '/build'; title = 'בנו לי סט · SkillForYou'; }
     else if (parts[0] === 'guides') { html = guides(); active = '/guides'; title = 'מדריכים · SkillForYou'; }
     else if (parts[0] === 'guide') { html = guide(parts[1]); active = '/guides'; title = 'מדריך · SkillForYou'; }
+    else if (parts[0] === 'claude-code') { html = claudeCode(); active = '/guides'; title = 'פקודות ב־Claude Code · SkillForYou'; }
     else if (parts[0] === 'students') { html = students(); active = '/guides'; title = 'סקילים לסטודנטים · SkillForYou'; }
     else if (parts[0] === 'models') { html = models(); active = '/models'; title = 'מודלים · SkillForYou'; }
     else if (parts[0] === 'updates') { html = updates(); active = '/updates'; title = 'עדכונים · SkillForYou'; }

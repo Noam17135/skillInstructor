@@ -123,7 +123,7 @@ async function main() {
     await go('#/guides');
     const guides = await page.$$eval('a[href^="#/guide/"]', (a) => a.map((x) => x.getAttribute('href')));
     for (const g of guides) await go(g);
-    for (const h of ['#/build', '#/students', '#/models', '#/updates', '#/legal/terms', '#/legal/report', '#/no-such-page']) await go(h);
+    for (const h of ['#/build', '#/students', '#/claude-code', '#/models', '#/updates', '#/legal/terms', '#/legal/report', '#/no-such-page']) await go(h);
     for (const id of (vp.name === 'מחשב' ? sample : sample.slice(0, 10))) await go('#/skill/' + encodeURIComponent(id), 500);
 
     /* ---------- flows ---------- */
