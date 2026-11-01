@@ -431,8 +431,7 @@
           return '<div class="cc-row"><code dir="ltr">' + esc(c[0]) + '</code><div><p>' + esc(c[1]) + '</p><span>מתי: ' + esc(c[2]) + '</span></div></div>';
         }).join('') + '</div></section>';
       }).join('') +
-      '<p class="note">חלק מהפקודות תלויות בגרסה ובמסלול, כך שאצלכם התפריט עשוי להיראות קצת אחרת. כדי לראות את כל הפקודות, כותבים / בשורת הצ׳אט. ' +
-      'מקור: <a href="https://code.claude.com/docs/en/commands" target="_blank" rel="noopener">התיעוד של Claude Code</a>.</p></div>';
+      '<p class="note">חלק מהפקודות תלויות בגרסה ובמסלול, כך שאצלכם התפריט עשוי להיראות קצת אחרת. כדי לראות את כל הפקודות, כותבים / בשורת הצ׳אט.</p></div>';
   }
   /* ---------- students ---------- */
   var FIELDS = [
